@@ -20,6 +20,11 @@ typedef struct vec4_s {
     float x,y,z,w;
 } vec4;
 
+
+void put_pixel(u32 x, u32 y, u32 c) {
+    framebuffer[(y * SCREEN_WIDTH) + x] = c;
+}
+
 int main() {
     printf("SPARRY\n");
 
@@ -39,7 +44,6 @@ int main() {
 
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA32, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-
     SDL_Event event;
     int game_running = 1;
 
@@ -50,8 +54,10 @@ int main() {
             }
         }
 
-    framebuffer[100] = 0xFFFF0000;
-        framebuffer[5000] = 0xFFFF0000;
+        for (int i = 0; i < 100; i++) {
+            framebuffer[10000+i] = 0xFFFF0000;
+            put_pixel(150+i, 150+i, 0xFF00FF00);
+        }
 
         SDL_UpdateTexture(texture, NULL, framebuffer, SCREEN_WIDTH * sizeof(u32));
         SDL_RenderCopy(renderer, texture, NULL, NULL);
