@@ -1,10 +1,10 @@
-#include "SDL2/SDL_render.h"
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <SDL2/SDL.h>
 
-#define SCREEN_WIDTH 300
-#define SCREEN_HEIGHT 300
+#define SCREEN_WIDTH 600
+#define SCREEN_HEIGHT 600
 
 typedef uint32_t u32;
 typedef float f32;
@@ -13,16 +13,19 @@ static u32 framebuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
 static f32 zbuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
 
 typedef struct vec3_s {
-    float x,y,z;
+    f32 x,y,z;
 } vec3;
 
 typedef struct vec4_s {
-    float x,y,z,w;
+    f32 x,y,z,w;
 } vec4;
 
-
-void put_pixel(u32 x, u32 y, u32 c) {
-    framebuffer[(y * SCREEN_WIDTH) + x] = c;
+void put_pixel(u32 x, u32 y, u32 z, u32 c) {
+    u32 idx = (y * SCREEN_WIDTH) + x;
+    if (!zbuffer[idx] || zbuffer[idx]> z) {
+        zbuffer[idx] = z;
+        framebuffer[idx] = c;
+    }
 }
 
 int main() {
@@ -45,7 +48,7 @@ int main() {
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA32, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     SDL_Event event;
-    int game_running = 1;
+    bool game_running = 1;
 
     while (game_running == 1) {
         while (SDL_PollEvent(&event)) {
@@ -56,7 +59,8 @@ int main() {
 
         for (int i = 0; i < 100; i++) {
             framebuffer[10000+i] = 0xFFFF0000;
-            put_pixel(150+i, 150+i, 0xFF00FF00);
+            put_pixel((SCREEN_WIDTH/2)+i, (SCREEN_HEIGHT/2)+i, 5, 0xFF00FF00);
+            put_pixel((SCREEN_WIDTH/2)+i, (SCREEN_HEIGHT/2)+100-i, 10, 0xFF0000FF);
         }
 
         SDL_UpdateTexture(texture, NULL, framebuffer, SCREEN_WIDTH * sizeof(u32));
