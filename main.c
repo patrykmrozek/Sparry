@@ -20,7 +20,8 @@ typedef struct vec4_s {
     f32 x,y,z,w;
 } vec4;
 
-void put_pixel(u32 x, u32 y, u32 z, u32 c) {
+void put_pixel(u32 x, u32 y, u32 z, u32 c)
+{
     u32 idx = (y * SCREEN_WIDTH) + x;
     if (!zbuffer[idx] || zbuffer[idx]> z) {
         zbuffer[idx] = z;
@@ -28,7 +29,17 @@ void put_pixel(u32 x, u32 y, u32 z, u32 c) {
     }
 }
 
-int main() {
+void put_pixel_vec(vec3 v, u32 c)
+{
+    u32 idx = (v.y * SCREEN_WIDTH) + v.x;
+    if (!zbuffer[idx] || zbuffer[idx]> v.z) {
+        zbuffer[idx] = v.z;
+        framebuffer[idx] = c;
+    }
+}
+
+int main() 
+{
     printf("SPARRY\n");
 
 	SDL_Init(SDL_INIT_VIDEO);
@@ -61,6 +72,7 @@ int main() {
             framebuffer[10000+i] = 0xFFFF0000;
             put_pixel((SCREEN_WIDTH/2)+i, (SCREEN_HEIGHT/2)+i, 5, 0xFF00FF00);
             put_pixel((SCREEN_WIDTH/2)+i, (SCREEN_HEIGHT/2)+100-i, 10, 0xFF0000FF);
+            put_pixel_vec((vec3){(SCREEN_WIDTH/2)+i, (SCREEN_HEIGHT/2)+50, 7}, 0xFFFFFF00);
         }
 
         SDL_UpdateTexture(texture, NULL, framebuffer, SCREEN_WIDTH * sizeof(u32));
