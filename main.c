@@ -24,11 +24,35 @@ typedef struct mat4_s {
     vec4_t v[4];
 } mat4_t;
 
+static inline vec3_t vec3_add(vec3_t v1, vec3_t v2)
+{
+    return (vec3_t){v1.x+v2.x, v1.y+v2.y, v1.z+v2.z};
+}
+static inline vec3_t vec3_sub(vec3_t v1, vec3_t v2)
+{
+    return (vec3_t){v1.x-v2.x, v1.y-v2.y, v1.z-v2.z};
+}
+static inline vec3_t vec3_mul(vec3_t v1, vec3_t v2)
+{
+   return (vec3_t){v1.x*v2.x, v1.y*v2.y, v1.z*v2.z}; 
+}
+static inline vec3_t vec3_div(vec3_t v1, vec3_t v2)
+{
+    return (vec3_t){v1.x/v2.x, v1.y/v2.y, v1.z/v2.z};
+}
 static inline f32 vec3_dot(vec3_t v1, vec3_t v2)
 {
     return ((v1.x*v2.x) + (v1.y*v2.y) + (v1.z*v2.z));
 }
-
+static inline f32 vec3_length(vec3_t v)
+{
+    return (sqrtf(vec3_dot(v, v)));
+}
+static inline vec3_t vec3_normalize(vec3_t v)
+{
+    f32 len = vec3_length(v);
+    return (vec3_t)vec3_div(v, (vec3_t){len, len, len});
+}
 static inline vec4_t mat4_mul_vec4(mat4_t m, vec4_t v)
 {
     return (vec4_t){
