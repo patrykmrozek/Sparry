@@ -39,6 +39,14 @@ static inline f32 v3_dot(v3 v1, v3 v2)
 {
     return ((v1.x*v2.x) + (v1.y*v2.y) + (v1.z*v2.z));
 }
+static inline v3 v3_cross(v3 v1, v3 v2)
+{
+    return (v3){
+        (v1.y * v2.z) - (v1.z * v2.y),
+        (v1.z * v2.x) - (v1.x * v2.z),
+        (v1.x * v2.y) - (v1.y * v2.x),
+    };
+}
 static inline f32 v3_len(v3 v)
 {
     return (sqrtf(v3_dot(v, v)));
@@ -67,6 +75,11 @@ static inline v4 v4_norm(v4 v)
 {
     return (v4){v.x/v.w, v.y/v.w, v.z/v.w, v.w/v.w}; 
 }
+static inline v3 v4_to_v3(v4 v)
+{
+    if (v.w != 1) v = v4_norm(v);
+    return (v3){v.x, v.y, v.z};
+}
 static inline v4 m4_v4_mul(m4 m, v4 v)
 {
     return (v4){
@@ -86,6 +99,11 @@ static inline v4 v4_trans(v4 v, v3 t)
     };
     return m4_v4_mul(tm, v);
 }
+static inline v3 v3_trans(v3 v, v3 t)
+{
+    v4 ret = v4_trans(v3_to_v4(v), t);
+    return v4_to_v3(ret);
+}
 static inline v4 v4_scale(v4 v, f32 s)
 {
     m4 sm = (m4){
@@ -102,41 +120,43 @@ typedef struct camera_s {
     v3 up;
     v3 look_at;
 } camera_t;
+
 camera_t g_camera = (camera_t){
-    (v3){0, 10, -10},
-    (v3){0, 1, 0},
-    (v3){0, 0, 0}
+    .pos=(v3){0, 1, -1},
+    .up=(v3){0,  1,   0},
+    .look_at=(v3){0,  0,   0}
 };
 
-static inline void to_view_space(void)
+static inline void to_view_space(v3 *_v)
 {
     //first of all, move world - camera
     //for all elements in the world:
-    //v4_trans(object, v3_to_v4(v3_neg(g_camera.pos))); //something like this?
+    *_v = v3_trans(*_v, v3_neg(g_camera.pos)); //something like this?
 
     //next, we need to orient so that the up side is up :|
     //cam c is looking at l, dir d is l-c norm(d) is look_at dir
-    //v3 d = v3_norm(v3_sub(g_camera.look_at, g_camera.pos)); //i guess?
+    v3 n = v3_norm(v3_sub(g_camera.look_at, g_camera.pos)); //i guess?
     //this dir represents the new "z" axis (as its perpendicular to our viewing plane / screen)
     
     //since we know up dir also, we can use this and d to find axis orthogonal to both up and d
-    //v3 u = v3_norm(v3_cross(g_camera.up, d)); //?
+    v3 u = v3_norm(v3_cross(g_camera.up, n)); //?
     //this is our new x axis in out viewing plane
     
     //we can finally then get our new y axis (up vector) like:
-    //v3 v = v3_cross(u, d);
+    v3 v = v3_cross(u, n);
     //since its orthogonal to both our new z axis and our new x axis, and so our new y axis
     
     //putting these all together, we can form a sigle change of coord matrix:
-    //m4 view_mat = (m4){
-    //  (v4){u.x, v.x, n.x, 0},
-    //  (v4){u.y, v.y, n.y, 0},
-    //  (v4){u.z, v.z, n.z, 0},
-    //  (v4){0,   0    0,   1},
-    //};
+    m4 view_mat = (m4){
+      (v4){u.x, v.x, n.x, 0},
+      (v4){u.y, v.y, n.y, 0},
+      (v4){u.z, v.z, n.z, 0},
+      (v4){0,   0,    0,   1},
+    };
     
     //and then the object can be moved to view space after multiplying by this matrix to it
-    //m4_v4_mul(view_mat, v3_to_v4(object.pos)); //?
+    *_v = v4_to_v3((m4_v4_mul(view_mat, v3_to_v4(*_v)))); //?
+}
 
 static inline void put_pixel(u32 x, u32 y, u32 z, u32 c)
 {
