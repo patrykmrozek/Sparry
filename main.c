@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -11,6 +12,10 @@ typedef float f32;
 
 static u32 framebuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
 static f32 zbuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
+
+#define NEAR 1.0f
+#define FAR 10.0f
+#define FOV 90.0f //deg
 
 typedef struct v3_s {
     f32 x,y,z;
@@ -158,18 +163,39 @@ static inline void to_view_space(v3 *_v)
     *_v = v4_to_v3((m4_v4_mul(view_mat, v3_to_v4(*_v)))); //?
 }
 
+static inline void to_ndc(v3 *_v)
+{
+    f32 width = -2 * NEAR * tan(FOV/2);
+    f32 height = width / (SCREEN_WIDTH/SCREEN_HEIGHT);
+
+    m4 proj_mat = (m4){
+        (v4){(2*NEAR)/height, 0,               0,                      0},
+        (v4){0,               (2*NEAR)/height, 0,                      0},
+        (v4){0,               0,               -(FAR+NEAR)/FAR-NEAR,  -1},
+        (v4){0,               0,               (-2*FAR*NEAR)/FAR-NEAR, 0},
+    };
+
+    *_v = v4_to_v3(v4_norm(m4_v4_mul(proj_mat, v3_to_v4(*_v))));
+}
+
 static inline void put_pixel(u32 x, u32 y, u32 z, u32 c)
 {
     u32 idx = (y * SCREEN_WIDTH) + x;
+    if (idx < 0 || idx >= SCREEN_HEIGHT*SCREEN_WIDTH) {
+        return;
+    }
     if (!zbuffer[idx] || zbuffer[idx]> z) {
         zbuffer[idx] = z;
         framebuffer[idx] = c;
     }
 }
-
 static inline void put_pixel_vec(v3 v, u32 c)
 {
     u32 idx = (v.y * SCREEN_WIDTH) + v.x;
+    if (idx < 0 || idx >= SCREEN_HEIGHT*SCREEN_WIDTH) {
+        return;
+    }
+    printf("idx: %d\n", idx);
     if (!zbuffer[idx] || zbuffer[idx]> v.z) {
         zbuffer[idx] = v.z;
         framebuffer[idx] = c;
@@ -214,14 +240,25 @@ int main()
             if (event.type == SDL_QUIT) {
                 game_running = 0;
             }
+            const uint8_t* keystate = SDL_GetKeyboardState(NULL);
+            if (keystate[SDL_SCANCODE_W]) g_camera.pos.z += 0.1;
+            if (keystate[SDL_SCANCODE_S]) g_camera.pos.z -= 0.1;
+            if (keystate[SDL_SCANCODE_A]) g_camera.pos.x -= 0.1;
+            if (keystate[SDL_SCANCODE_D]) g_camera.pos.x += 0.1;
         }
-
+        /*
         for (int i = 0; i < 100; i++) {
             framebuffer[10000+i] = 0xFFFF0000;
             put_pixel((SCREEN_WIDTH/2)+i, (SCREEN_HEIGHT/2)+i, 5, 0xFF00FF00);
             put_pixel((SCREEN_WIDTH/2)+i, (SCREEN_HEIGHT/2)+100-i, 10, 0xFF0000FF);
             put_pixel_vec((v3){(SCREEN_WIDTH/2)+i, (SCREEN_HEIGHT/2)+50, 7}, 0xFFFFFF00);
         }
+        */
+        v3 point = {SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10};
+        to_view_space(&point);
+        to_ndc(&point);
+        printf("point: {%f, %f, %f}\n", point.x, point.y, point.z);
+        put_pixel_vec(point, 0xFFFF0000);
         
         SDL_UpdateTexture(texture, NULL, framebuffer, SCREEN_WIDTH * sizeof(u32));
         SDL_RenderCopy(renderer, texture, NULL, NULL);
