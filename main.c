@@ -13,9 +13,14 @@ typedef float f32;
 static u32 framebuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
 static f32 zbuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
 
+#define PI 3.14159265359f
+
+#define DEG_TO_RAD(_d) ((_d) * (PI / 180)) 
+#define RAD_TO_DEG(_d) ((_d) * (180 / PI))
+
 #define NEAR 1.0f
 #define FAR 10.0f
-#define FOV 90.0f //deg
+#define FOV DEG_TO_RAD(90) 
 
 typedef struct v3_s {
     f32 x,y,z;
@@ -85,13 +90,17 @@ static inline v3 v4_to_v3(v4 v)
     if (v.w != 1) v = v4_norm(v);
     return (v3){v.x, v.y, v.z};
 }
+static inline f32 v4_dot(v4 v1, v4 v2)
+{
+    return ((v1.x*v2.x) + (v1.y*v2.y) + (v1.z*v2.z) + (v1.w*v2.w));
+}
 static inline v4 m4_v4_mul(m4 m, v4 v)
 {
     return (v4){
-        v3_dot((v3){v.x, v.y, v.z}, (v3){m.v[0].x, m.v[1].x, m.v[2].x}) + m.v[3].x,
-        v3_dot((v3){v.x, v.y, v.z}, (v3){m.v[0].y, m.v[1].y, m.v[2].y}) + m.v[3].y,
-        v3_dot((v3){v.x, v.y, v.z}, (v3){m.v[0].z, m.v[1].z, m.v[2].z}) + m.v[3].z,
-        1,
+        v4_dot(m.v[0], v),
+        v4_dot(m.v[1], v),
+        v4_dot(m.v[2], v),
+        v4_dot(m.v[3], v),
     };
 }
 static inline v4 v4_trans(v4 v, v3 t)
@@ -235,16 +244,18 @@ int main()
     v4 mv = m4_v4_mul(m, v);
     printf("mv: {%f,%f,%f}\n", mv.x, mv.y, mv.z);
 
+    const uint8_t* keystate = SDL_GetKeyboardState(NULL);
     while (game_running == 1) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 game_running = 0;
             }
-            const uint8_t* keystate = SDL_GetKeyboardState(NULL);
-            if (keystate[SDL_SCANCODE_W]) g_camera.pos.z += 0.1;
-            if (keystate[SDL_SCANCODE_S]) g_camera.pos.z -= 0.1;
-            if (keystate[SDL_SCANCODE_A]) g_camera.pos.x -= 0.1;
-            if (keystate[SDL_SCANCODE_D]) g_camera.pos.x += 0.1;
+            if (keystate[SDL_SCANCODE_W]) g_camera.pos.z += 1;
+            if (keystate[SDL_SCANCODE_S]) g_camera.pos.z -= 1;
+            if (keystate[SDL_SCANCODE_A]) g_camera.pos.x -= 1;
+            if (keystate[SDL_SCANCODE_D]) g_camera.pos.x += 1;
+            if (keystate[SDL_SCANCODE_SPACE]) g_camera.pos.y += 1;
+            if (keystate[SDL_SCANCODE_LSHIFT]) g_camera.pos.y -= 1;
         }
         /*
         for (int i = 0; i < 100; i++) {
@@ -254,7 +265,7 @@ int main()
             put_pixel_vec((v3){(SCREEN_WIDTH/2)+i, (SCREEN_HEIGHT/2)+50, 7}, 0xFFFFFF00);
         }
         */
-        v3 point = {SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10};
+        v3 point = {0, 0, 10};
         to_view_space(&point);
         to_ndc(&point);
         printf("point: {%f, %f, %f}\n", point.x, point.y, point.z);
