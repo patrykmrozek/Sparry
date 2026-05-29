@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <SDL2/SDL.h>
 
 #define SCREEN_WIDTH 600
@@ -25,6 +26,18 @@ static f32 zbuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
 typedef struct v3_s {
     f32 x,y,z;
 } v3;
+static inline v3 v3_init(f32 x, f32 y, f32 z)
+{
+    return (v3){
+        .x=x,
+        .y=y,
+        .z=z
+    };
+}
+static inline v3 v3_fill(f32 f)
+{
+    return (v3){f, f, f};
+}
 static inline v3 v3_add(v3 v1, v3 v2)
 {
     return (v3){v1.x+v2.x, v1.y+v2.y, v1.z+v2.z};
@@ -103,30 +116,36 @@ static inline v4 m4_v4_mul(m4 m, v4 v)
         v4_dot(m.v[3], v),
     };
 }
+static inline m4 m4_trans(v3 t)
+{
+     return (m4){
+        (v4){1,   0,   0,   0},
+        (v4){0,   1,   0,   0},
+        (v4){0,   0,   1,   0},
+        (v4){t.x, t.y, t.z, 1},
+    };
+}
 static inline v4 v4_trans(v4 v, v3 t)
 {
-    m4 tm = (m4){
-        (v4){1,       0,       0,       0},
-        (v4){0,       1,       0,       0},
-        (v4){0,       0,       1,       0},
-        (v4){t.x+v.x, t.y+v.y, t.z+v.z, 1},
-    };
-    return m4_v4_mul(tm, v);
+    return m4_v4_mul(m4_trans(t), v);
 }
 static inline v3 v3_trans(v3 v, v3 t)
 {
     v4 ret = v4_trans(v3_to_v4(v), t);
     return v4_to_v3(ret);
 }
-static inline v4 v4_scale(v4 v, f32 s)
+static inline m4 m4_scale(v3 s)
 {
-    m4 sm = (m4){
-        (v4){v.x*s, 0,     0,     0},
-        (v4){0,     v.y*s, 0,     0},
-        (v4){0,     0,     v.z*s, 0},
-        (v4){0,     0,     0,     1},
+return (m4){
+        (v4){s.x, 0,   0,   0},
+        (v4){0,   s.y, 0,   0},
+        (v4){0,   0,   s.z, 0},
+        (v4){0,   0,   0,   1},
     };
-    return m4_v4_mul(sm, v);
+}
+static inline v4 v4_scale(v4 v, v3 s)
+{
+    return m4_v4_mul(m4_scale(s), v);
 }
 
 typedef struct camera_s {
@@ -265,6 +284,9 @@ int main()
             put_pixel_vec((v3){(SCREEN_WIDTH/2)+i, (SCREEN_HEIGHT/2)+50, 7}, 0xFFFFFF00);
         }
         */
+
+        //memset(framebuffer, 0, SCREEN_HEIGHT*SCREEN_WIDTH);
+
         v3 point = {0, 0, 10};
         to_view_space(&point);
         to_ndc(&point);
@@ -274,6 +296,7 @@ int main()
         SDL_UpdateTexture(texture, NULL, framebuffer, SCREEN_WIDTH * sizeof(u32));
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
+
     }
 
     SDL_DestroyRenderer(renderer);
