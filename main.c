@@ -23,47 +23,47 @@ static f32 zbuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
 #define FAR 10.0f
 #define FOV DEG_TO_RAD(90) 
 
-#define M4_ID (m4){   \
+#define M4_ID (m4){{   \
     {1, 0, 0, 0}, \
     {0, 1, 0, 0}, \
     {0, 0, 1, 0}, \
-    {0, 0, 0, 1}}
+    {0, 0, 0, 1}}}
 
-#define M4_TRANS(_t) (m4){       \
-    {   1,    0,    0,   0}, \
-    {   0,    1,    0,   0}, \
-    {   0,    0,    1,   0}, \
-    {_t.x, _t.y, _t.z,   1}}
+#define M4_TRANS(_t) (m4){{       \
+    {1, 0, 0, _t.x}, \
+    {0, 1, 0, _t.y}, \
+    {0, 0, 1, _t.z}, \
+    {0, 0, 0,  1}}}
 
-#define M4_SCALE(_s) (m4){  \
+#define M4_SCALE(_s) (m4){{  \
     {_s,     0,     0,   0}, \
     {  0,   _s,     0,   0}, \
     {  0,     0,   _s,   0}, \
-    {  0,     0,    0,   1}}
+    {  0,     0,    0,   1}}}
 
-#define M4_SCALEV(_s) (m4){  \
+#define M4_SCALEV(_s) (m4){{   \
     {_s.x,     0,     0,   0}, \
     {  0,   _s.y,     0,   0}, \
     {  0,     0,   _s.z,   0}, \
-    {  0,     0,     0,    1}} 
+    {  0,     0,     0,    1}}} 
 
-#define M4_ROTX(_a) (m4){          \
-    {1,        0,       0, 0}, \
-    {0,  cos(_a), sin(_a), 0}, \
-    {0, -sin(_a), cos(_a), 0}, \
-    {0,        0,       0, 1}}
+#define M4_ROTX(_a) (m4){{     \
+    {1,       0,       0, 0}, \
+    {0, cos(_a), -sin(_a), 0}, \
+    {0, sin(_a), cos(_a), 0}, \
+    {0,       0,       0, 1}}}
 
-#define M4_ROTY(_a) (m4){ \
-    {cos(_a), 0, -sin(_a), 0}, \
-    {      0, 1,        0, 0}, \
-    {sin(_a), 0,  cos(_a), 0}, \
-    {      0, 0,        0, 1}}
+#define M4_ROTY(_a) (m4){{     \
+    { cos(_a), 0, sin(_a), 0}, \
+    {       0, 1,        0, 0}, \
+    {-sin(_a), 0,  cos(_a), 0}, \
+    {       0, 0,        0, 1}}}
 
-#define M4_ROTZ(_a) (m4){          \
-    { cos(_a), sin(_a), 0, 0}, \
-    {-sin(_a), cos(_a), 0, 0}, \
+#define M4_ROTZ(_a) (m4){{     \
+    {cos(_a), -sin(_a), 0, 0}, \
+    {sin(_a),  cos(_a), 0, 0}, \
     {       0,       0, 1, 0}, \
-    {       0,       0, 0, 1}}
+    {       0,       0, 0, 1}}}
 
 typedef struct v3_s {
     f32 x,y,z;
@@ -130,7 +130,7 @@ typedef struct v4_s {
     f32 x,y,z,w;
 } v4;
 typedef struct m4_s {
-    f32 v[4][4]; //[col][row]
+    f32 v[4][4]; //[row][col]
 } m4;
 static inline v4 v3_to_v4(v3 v)
 {
@@ -139,6 +139,10 @@ static inline v4 v3_to_v4(v3 v)
 static inline v4 v4_norm(v4 v)
 {
     return (v4){v.x/v.w, v.y/v.w, v.z/v.w, v.w/v.w}; 
+}
+static inline void v4_print(v4 v)
+{
+    printf("{ %f, %f, %f, %f }\n", v.x, v.y, v.z, v.w);
 }
 static inline v3 v4_to_v3(v4 v)
 {
@@ -152,8 +156,8 @@ static inline f32 v4_dot(v4 v1, v4 v2)
 static inline v4 m4_v4_mul(m4 m, v4 v)
 {
     f32 out[4];
-    for (int i = 0; i < 4; i++) {
-        out[i] = v4_dot((v4){m.v[0][i], m.v[1][i], m.v[2][i], m.v[3][i]}, v);
+    for (int row = 0; row < 4; row++) {
+        out[row] = v4_dot((v4){m.v[row][0], m.v[row][1], m.v[row][2], m.v[row][3]}, v);
     }
     return (v4){out[0], out[1], out[2], out[3]};
 }
@@ -163,11 +167,17 @@ static inline m4 m4_mul(m4 m1, m4 m2)
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             out.v[i][j] = v4_dot(
-                    (v4){m1.v[0][j], m1.v[1][j], m1.v[2][j], m1.v[3][j]},
-                    (v4){m2.v[i][0], m2.v[i][1], m2.v[i][2], m2.v[i][3]});
+                (v4){m1.v[i][0], m1.v[i][1], m1.v[i][2], m1.v[i][3]},
+                (v4){m2.v[0][j], m2.v[1][j], m2.v[2][j], m2.v[3][j]});
         }
     }
     return out;
+}
+static inline void m4_print(m4 m)
+{
+    for (int row = 0; row < 4; row++) {
+        v4_print((v4){m.v[row][0], m.v[row][1], m.v[row][2], m.v[row][3]});
+    }
 }
 static inline v4 v4_trans(v4 v, v3 t)
 {
@@ -175,8 +185,7 @@ static inline v4 v4_trans(v4 v, v3 t)
 }
 static inline v3 v3_trans(v3 v, v3 t)
 {
-    v4 ret = v4_trans(v3_to_v4(v), t);
-    return v4_to_v3(ret);
+    return v4_to_v3(v4_trans(v3_to_v4(v), t));
 }
 static inline v4 v4_scale(v4 v, f32 s)
 {
@@ -219,12 +228,12 @@ static inline void to_view_space(v3 *_v)
     //since its orthogonal to both our new z axis and our new x axis, and so our new y axis
     
     //putting these all together, we can form a sigle change of coord matrix:
-    m4 view_mat = (m4){
+    m4 view_mat = (m4){{
       {u.x, v.x, n.x, 0},
       {u.y, v.y, n.y, 0},
       {u.z, v.z, n.z, 0},
       {0,   0,    0,   1},
-    };
+    }};
     
     //and then the object can be moved to view space after multiplying by this matrix to it
     *_v = v4_to_v3((m4_v4_mul(view_mat, v3_to_v4(*_v)))); //?
@@ -233,14 +242,14 @@ static inline void to_view_space(v3 *_v)
 static inline void to_ndc(v3 *_v)
 {
     f32 width = -2 * NEAR * tan(FOV/2);
-    f32 height = width / (SCREEN_WIDTH/SCREEN_HEIGHT);
+    f32 height = width / (f32)(SCREEN_WIDTH/(f32)SCREEN_HEIGHT);
 
-    m4 proj_mat = (m4){
+    m4 proj_mat = (m4){{
         {(2*NEAR)/height, 0,               0,                      0},
         {0,               (2*NEAR)/height, 0,                      0},
         {0,               0,               -(FAR+NEAR)/FAR-NEAR,  -1},
         {0,               0,               (-2*FAR*NEAR)/FAR-NEAR, 0},
-    };
+    }};
 
     *_v = v4_to_v3(v4_norm(m4_v4_mul(proj_mat, v3_to_v4(*_v))));
 }
@@ -262,7 +271,6 @@ static inline void put_pixel_vec(v3 v, u32 c)
     if (idx < 0 || idx >= SCREEN_HEIGHT*SCREEN_WIDTH) {
         return;
     }
-    printf("idx: %d\n", idx);
     if (!zbuffer[idx] || zbuffer[idx]> v.z) {
         zbuffer[idx] = v.z;
         framebuffer[idx] = c;
@@ -292,15 +300,17 @@ int main()
     SDL_Event event;
     bool game_running = 1;
 
-    v4 v = (v4){1, 1, 1, 1};
-    m4 m = (m4){
+    m4 m = (m4){{
         {2, 0, 0, 0},
         {0, 2, 0, 0},
         {0, 0, 2, 0},
         {1, 2, 3, 1},
-    };
-    v4 mv = m4_v4_mul(m, v);
-    printf("mv: {%f,%f,%f}\n", mv.x, mv.y, mv.z);
+    }};
+    m4 res = m4_mul(m, M4_ID);
+    m4_print(res);
+    printf("\n");
+    res = m4_mul(M4_ID, m);
+    m4_print(res);
 
     const uint8_t* keystate = SDL_GetKeyboardState(NULL);
     while (game_running == 1) {
@@ -329,7 +339,7 @@ int main()
         v3 point = {0, 0, 10};
         to_view_space(&point);
         to_ndc(&point);
-        printf("point: {%f, %f, %f}\n", point.x, point.y, point.z);
+        //printf("point: {%f, %f, %f}\n", point.x, point.y, point.z);
         put_pixel_vec(point, 0xFFFF0000);
         
         SDL_UpdateTexture(texture, NULL, framebuffer, SCREEN_WIDTH * sizeof(u32));
