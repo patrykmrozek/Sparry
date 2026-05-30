@@ -23,6 +23,48 @@ static f32 zbuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
 #define FAR 10.0f
 #define FOV DEG_TO_RAD(90) 
 
+#define M4_ID (m4){   \
+    {1, 0, 0, 0}, \
+    {0, 1, 0, 0}, \
+    {0, 0, 1, 0}, \
+    {0, 0, 0, 1}}
+
+#define M4_TRANS(_t) (m4){       \
+    {   1,    0,    0,   0}, \
+    {   0,    1,    0,   0}, \
+    {   0,    0,    1,   0}, \
+    {_t.x, _t.y, _t.z,   1}}
+
+#define M4_SCALE(_s) (m4){  \
+    {_s,     0,     0,   0}, \
+    {  0,   _s,     0,   0}, \
+    {  0,     0,   _s,   0}, \
+    {  0,     0,    0,   1}}
+
+#define M4_SCALEV(_s) (m4){  \
+    {_s.x,     0,     0,   0}, \
+    {  0,   _s.y,     0,   0}, \
+    {  0,     0,   _s.z,   0}, \
+    {  0,     0,     0,    1}} 
+
+#define M4_ROTX(_a) (m4){          \
+    {1,        0,       0, 0}, \
+    {0,  cos(_a), sin(_a), 0}, \
+    {0, -sin(_a), cos(_a), 0}, \
+    {0,        0,       0, 1}}
+
+#define M4_ROTY(_a) (m4){ \
+    {cos(_a), 0, -sin(_a), 0}, \
+    {      0, 1,        0, 0}, \
+    {sin(_a), 0,  cos(_a), 0}, \
+    {      0, 0,        0, 1}}
+
+#define M4_ROTZ(_a) (m4){          \
+    { cos(_a), sin(_a), 0, 0}, \
+    {-sin(_a), cos(_a), 0, 0}, \
+    {       0,       0, 1, 0}, \
+    {       0,       0, 0, 1}}
+
 typedef struct v3_s {
     f32 x,y,z;
 } v3;
@@ -88,7 +130,7 @@ typedef struct v4_s {
     f32 x,y,z,w;
 } v4;
 typedef struct m4_s {
-    v4 v[4];
+    f32 v[4][4]; //[col][row]
 } m4;
 static inline v4 v3_to_v4(v3 v)
 {
@@ -109,43 +151,40 @@ static inline f32 v4_dot(v4 v1, v4 v2)
 }
 static inline v4 m4_v4_mul(m4 m, v4 v)
 {
-    return (v4){
-        v4_dot(m.v[0], v),
-        v4_dot(m.v[1], v),
-        v4_dot(m.v[2], v),
-        v4_dot(m.v[3], v),
-    };
+    f32 out[4];
+    for (int i = 0; i < 4; i++) {
+        out[i] = v4_dot((v4){m.v[0][i], m.v[1][i], m.v[2][i], m.v[3][i]}, v);
+    }
+    return (v4){out[0], out[1], out[2], out[3]};
 }
-static inline m4 m4_trans(v3 t)
+static inline m4 m4_mul(m4 m1, m4 m2)
 {
-     return (m4){
-        (v4){1,   0,   0,   0},
-        (v4){0,   1,   0,   0},
-        (v4){0,   0,   1,   0},
-        (v4){t.x, t.y, t.z, 1},
-    };
+    m4 out;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            out.v[i][j] = v4_dot(
+                    (v4){m1.v[0][j], m1.v[1][j], m1.v[2][j], m1.v[3][j]},
+                    (v4){m2.v[i][0], m2.v[i][1], m2.v[i][2], m2.v[i][3]});
+        }
+    }
+    return out;
 }
 static inline v4 v4_trans(v4 v, v3 t)
 {
-    return m4_v4_mul(m4_trans(t), v);
+    return m4_v4_mul(M4_TRANS(t), v);
 }
 static inline v3 v3_trans(v3 v, v3 t)
 {
     v4 ret = v4_trans(v3_to_v4(v), t);
     return v4_to_v3(ret);
 }
-static inline m4 m4_scale(v3 s)
+static inline v4 v4_scale(v4 v, f32 s)
 {
-return (m4){
-        (v4){s.x, 0,   0,   0},
-        (v4){0,   s.y, 0,   0},
-        (v4){0,   0,   s.z, 0},
-        (v4){0,   0,   0,   1},
-    };
+    return m4_v4_mul(M4_SCALE(s), v);
 }
-static inline v4 v4_scale(v4 v, v3 s)
+static inline v4 v4_scalev(v4 v, v3 s)
 {
-    return m4_v4_mul(m4_scale(s), v);
+    return m4_v4_mul(M4_SCALEV(s), v);
 }
 
 typedef struct camera_s {
@@ -181,10 +220,10 @@ static inline void to_view_space(v3 *_v)
     
     //putting these all together, we can form a sigle change of coord matrix:
     m4 view_mat = (m4){
-      (v4){u.x, v.x, n.x, 0},
-      (v4){u.y, v.y, n.y, 0},
-      (v4){u.z, v.z, n.z, 0},
-      (v4){0,   0,    0,   1},
+      {u.x, v.x, n.x, 0},
+      {u.y, v.y, n.y, 0},
+      {u.z, v.z, n.z, 0},
+      {0,   0,    0,   1},
     };
     
     //and then the object can be moved to view space after multiplying by this matrix to it
@@ -197,10 +236,10 @@ static inline void to_ndc(v3 *_v)
     f32 height = width / (SCREEN_WIDTH/SCREEN_HEIGHT);
 
     m4 proj_mat = (m4){
-        (v4){(2*NEAR)/height, 0,               0,                      0},
-        (v4){0,               (2*NEAR)/height, 0,                      0},
-        (v4){0,               0,               -(FAR+NEAR)/FAR-NEAR,  -1},
-        (v4){0,               0,               (-2*FAR*NEAR)/FAR-NEAR, 0},
+        {(2*NEAR)/height, 0,               0,                      0},
+        {0,               (2*NEAR)/height, 0,                      0},
+        {0,               0,               -(FAR+NEAR)/FAR-NEAR,  -1},
+        {0,               0,               (-2*FAR*NEAR)/FAR-NEAR, 0},
     };
 
     *_v = v4_to_v3(v4_norm(m4_v4_mul(proj_mat, v3_to_v4(*_v))));
@@ -255,10 +294,10 @@ int main()
 
     v4 v = (v4){1, 1, 1, 1};
     m4 m = (m4){
-        (v4){2, 0, 0, 0},
-        (v4){0, 2, 0, 0},
-        (v4){0, 0, 2, 0},
-        (v4){1, 2, 3, 1},
+        {2, 0, 0, 0},
+        {0, 2, 0, 0},
+        {0, 0, 2, 0},
+        {1, 2, 3, 1},
     };
     v4 mv = m4_v4_mul(m, v);
     printf("mv: {%f,%f,%f}\n", mv.x, mv.y, mv.z);
