@@ -379,7 +379,8 @@ int main()
         }
         */
 
-        //memset(framebuffer, 0, sizeof(framebuffer));
+        memset(framebuffer, 0, sizeof(framebuffer));
+        memset(zbuffer, 0, sizeof(zbuffer));
 
         v3 p1 = {-10, -10, 0};
         v3 p2 = { 10, -10, 0};
