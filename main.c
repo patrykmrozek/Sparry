@@ -9,6 +9,7 @@
 #define SCREEN_HEIGHT 600
 
 typedef uint32_t u32;
+typedef int i32;
 typedef float f32;
 
 static u32 framebuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
@@ -20,7 +21,7 @@ static f32 zbuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
 #define RAD_TO_DEG(_d) ((_d) * (180 / PI))
 
 #define NEAR 1.0f
-#define FAR 10.0f
+#define FAR 100000.0f
 #define FOV DEG_TO_RAD(90) 
 
 #define M4_ID (m4){{   \
@@ -75,6 +76,10 @@ static inline v3 v3_init(f32 x, f32 y, f32 z)
         .y=y,
         .z=z
     };
+}
+static inline void v3_print(v3 v)
+{
+    printf("{ %f, %f, %f }\n", v.x, v.y, v.z);
 }
 static inline v3 v3_fill(f32 f)
 {
@@ -196,6 +201,19 @@ static inline v4 v4_scalev(v4 v, v3 s)
     return m4_v4_mul(M4_SCALEV(s), v);
 }
 
+static inline f32 lerp(f32 a, f32 b, f32 t)
+{
+    return a + (b - a) * t;
+}
+static inline v3 v3_lerp(v3 a, v3 b, f32 t)
+{
+    return (v3){
+        .x = lerp(a.x, b.x, t),
+        .y = lerp(a.y, b.y, t),
+        .z = lerp(a.z, b.z, t)
+    };
+}
+
 typedef struct camera_s {
     v3 pos;
     v3 up;
@@ -203,7 +221,7 @@ typedef struct camera_s {
 } camera_t;
 
 camera_t g_camera = (camera_t){
-    .pos=(v3){0, 1, -1},
+    .pos=(v3){0, 0, -100},
     .up=(v3){0,  1,   0},
     .look_at=(v3){0,  0,   0}
 };
@@ -220,7 +238,7 @@ static inline void to_view_space(v3 *_v)
     //this dir represents the new "z" axis (as its perpendicular to our viewing plane / screen)
     
     //since we know up dir also, we can use this and d to find axis orthogonal to both up and d
-    v3 u = v3_norm(v3_cross(g_camera.up, n)); //?
+    v3 u = v3_norm(v3_cross(n, g_camera.up)); //?
     //this is our new x axis in out viewing plane
     
     //we can finally then get our new y axis (up vector) like:
@@ -229,9 +247,9 @@ static inline void to_view_space(v3 *_v)
     
     //putting these all together, we can form a sigle change of coord matrix:
     m4 view_mat = (m4){{
-      {u.x, v.x, n.x, 0},
-      {u.y, v.y, n.y, 0},
-      {u.z, v.z, n.z, 0},
+      {u.x, u.y, u.z, 0},
+      {v.x, v.y, v.z, 0},
+      {n.x, n.y, n.z, 0},
       {0,   0,    0,   1},
     }};
     
@@ -241,20 +259,45 @@ static inline void to_view_space(v3 *_v)
 
 static inline void to_ndc(v3 *_v)
 {
-    f32 width = -2 * NEAR * tan(FOV/2);
-    f32 height = width / (f32)(SCREEN_WIDTH/(f32)SCREEN_HEIGHT);
+
+
+    f32 aspect = (f32)(SCREEN_WIDTH/(f32)SCREEN_HEIGHT);
+    f32 f = 1.0f / tanf(FOV * 0.5);
 
     m4 proj_mat = (m4){{
-        {(2*NEAR)/height, 0,               0,                      0},
-        {0,               (2*NEAR)/height, 0,                      0},
-        {0,               0,               -(FAR+NEAR)/FAR-NEAR,  -1},
-        {0,               0,               (-2*FAR*NEAR)/FAR-NEAR, 0},
+        {f/aspect, 0,               0,                        0},
+        {0,               f, 0,                        0},
+        {0,               0,               -(FAR+NEAR)/(NEAR-FAR),  (-2*FAR*NEAR)/(NEAR-FAR)},
+        {0,               0,               -1, 0},
     }};
 
     *_v = v4_to_v3(v4_norm(m4_v4_mul(proj_mat, v3_to_v4(*_v))));
 }
 
-static inline void put_pixel(u32 x, u32 y, u32 z, u32 c)
+static inline void to_screen(v3 *v)
+{
+    v->x = (v->x + 1.0f) * 0.5f * SCREEN_WIDTH;
+    v->y = (1.0f - v->y) * 0.5f * SCREEN_HEIGHT;
+}
+
+static inline v3 *world_to_screen(v3 *v)
+{
+    printf("ORIGINAL: ");
+    v3_print(*v);
+    to_view_space(v);
+    printf("VIEW: ");
+    v3_print(*v);
+    if (v->z <= NEAR || v->z >= FAR) return (v3*){0}; //clip
+    to_ndc(v);
+    printf("NDC: ");
+    v3_print(*v);
+    to_screen(v);
+    printf("SCREEN: ");
+    v3_print(*v);
+
+    return v;
+}
+static inline void put_pixel(i32 x, i32 y, i32 z, u32 c)
 {
     u32 idx = (y * SCREEN_WIDTH) + x;
     if (idx < 0 || idx >= SCREEN_HEIGHT*SCREEN_WIDTH) {
@@ -267,15 +310,17 @@ static inline void put_pixel(u32 x, u32 y, u32 z, u32 c)
 }
 static inline void put_pixel_vec(v3 v, u32 c)
 {
+    v.x = (i32)v.x;
+    v.y = (i32)v.y;
+    if (v.x < 0 || v.x >= SCREEN_WIDTH || v.y < 0 || v.y >= SCREEN_HEIGHT) return;
+
     u32 idx = (v.y * SCREEN_WIDTH) + v.x;
-    if (idx < 0 || idx >= SCREEN_HEIGHT*SCREEN_WIDTH) {
-        return;
-    }
     if (!zbuffer[idx] || zbuffer[idx]> v.z) {
         zbuffer[idx] = v.z;
         framebuffer[idx] = c;
     }
 }
+
 
 int main() 
 {
@@ -318,12 +363,12 @@ int main()
             if (event.type == SDL_QUIT) {
                 game_running = 0;
             }
-            if (keystate[SDL_SCANCODE_W]) g_camera.pos.z += 1;
-            if (keystate[SDL_SCANCODE_S]) g_camera.pos.z -= 1;
-            if (keystate[SDL_SCANCODE_A]) g_camera.pos.x -= 1;
-            if (keystate[SDL_SCANCODE_D]) g_camera.pos.x += 1;
-            if (keystate[SDL_SCANCODE_SPACE]) g_camera.pos.y += 1;
-            if (keystate[SDL_SCANCODE_LSHIFT]) g_camera.pos.y -= 1;
+            if (keystate[SDL_SCANCODE_W]) g_camera.pos.z += 1.0f;
+            if (keystate[SDL_SCANCODE_S]) g_camera.pos.z -= 1.0f;
+            if (keystate[SDL_SCANCODE_A]) g_camera.pos.x -= 1.0f;
+            if (keystate[SDL_SCANCODE_D]) g_camera.pos.x += 1.0f;
+            if (keystate[SDL_SCANCODE_SPACE]) g_camera.pos.y += 1.0f;
+            if (keystate[SDL_SCANCODE_LSHIFT]) g_camera.pos.y -= 1.0f;
         }
         /*
         for (int i = 0; i < 100; i++) {
@@ -334,13 +379,22 @@ int main()
         }
         */
 
-        //memset(framebuffer, 0, SCREEN_HEIGHT*SCREEN_WIDTH);
+        //memset(framebuffer, 0, sizeof(framebuffer));
 
-        v3 point = {0, 0, 10};
-        to_view_space(&point);
-        to_ndc(&point);
-        //printf("point: {%f, %f, %f}\n", point.x, point.y, point.z);
-        put_pixel_vec(point, 0xFFFF0000);
+        v3 p1 = {-10, -10, 0};
+        v3 p2 = { 10, -10, 0};
+        v3 p3 = {-10,  10, 0};
+        v3 p4 =  {10,  10, 0};
+        v3 ps[4] = {p1, p2, p3, p4};
+
+        for (int i = 0; i < 4; i++) {
+            if (world_to_screen(&ps[i])) {
+                //printf("P[%d]: ", i);
+                printf("\n");
+                //v3_print(ps[i]);
+                put_pixel_vec(ps[i], 0xFFFFFFFF);
+            }
+        }
         
         SDL_UpdateTexture(texture, NULL, framebuffer, SCREEN_WIDTH * sizeof(u32));
         SDL_RenderCopy(renderer, texture, NULL, NULL);
