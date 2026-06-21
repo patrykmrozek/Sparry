@@ -2,33 +2,17 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <SDL2/SDL.h>
 
-#include "camera.h"
 #include "render.h"
+#include "transform.h"
 
 int main() 
 {
     printf("SPARRY\n");
-
-	SDL_Init(SDL_INIT_VIDEO);
-	SDL_Window* window = SDL_CreateWindow(
-		"SPARRY",
-		SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED,
-		SCREEN_WIDTH,
-		SCREEN_HEIGHT,
-		SDL_WINDOW_SHOWN);
-    printf("window: %p\n", window);
-	SDL_RaiseWindow(window);
-
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    printf("renderer: %p\n", renderer);
-
-    SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA32, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
-
     SDL_Event event;
     bool game_running = 1;
+
+    render_state_t renderer = render_state_init();
 
     m4 m = (m4){{
         {2, 0, 0, 0},
@@ -82,13 +66,10 @@ int main()
             }
         }
         
-        SDL_UpdateTexture(texture, NULL, framebuffer, SCREEN_WIDTH * sizeof(u32));
-        SDL_RenderCopy(renderer, texture, NULL, NULL);
-        SDL_RenderPresent(renderer);
+        render_state_update(&renderer);
+        
+        }
 
-    }
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+    render_state_destroy(&renderer);
     return 0;
 }

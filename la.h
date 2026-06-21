@@ -2,6 +2,7 @@
 #define _LA_H
 
 #include <math.h>
+#include <stdio.h>
 #include "common.h"
 
 #define M4_ID (m4){{   \
