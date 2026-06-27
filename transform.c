@@ -1,71 +1,92 @@
 #include "transform.h"
 
-void to_view_space(v3 *_v)
+v3 to_view_space(v3 v)
 {
+    v3 view_cam_trans;
+    v3 view_x, view_y, view_z;
+    m4 view_mat;
+    v3 ret;
+
     //first of all, move world - camera
     //for all elements in the world:
-    *_v = v3_trans(*_v, v3_neg(g_camera.pos)); //something like this?
+    view_cam_trans = v3_trans(v, v3_neg(g_camera.pos)); //something like this?
 
     //next, we need to orient so that the up side is up :|
     //cam c is looking at l, dir d is l-c norm(d) is look_at dir
-    v3 n = v3_norm(v3_sub(g_camera.look_at, g_camera.pos)); //i guess?
+    view_z = v3_norm(v3_sub(g_camera.look_at, g_camera.pos)); //i guess?
     //this dir represents the new "z" axis (as its perpendicular to our viewing plane / screen)
     
     //since we know up dir also, we can use this and d to find axis orthogonal to both up and d
-    v3 u = v3_norm(v3_cross(n, g_camera.up)); //?
+    view_x = v3_norm(v3_cross(view_z, g_camera.up)); //?
     //this is our new x axis in out viewing plane
     
     //we can finally then get our new y axis (up vector) like:
-    v3 v = v3_cross(u, n);
+    view_y = v3_cross(view_x, view_z);
     //since its orthogonal to both our new z axis and our new x axis, and so our new y axis
     
     //putting these all together, we can form a sigle change of coord matrix:
-    m4 view_mat = (m4){{
-      {u.x, u.y, u.z, -v3_dot(u, g_camera.pos)},
-      {v.x, v.y, v.z, -v3_dot(v, g_camera.pos)},
-      {n.x, n.y, n.z, -v3_dot(n, g_camera.pos)},
+    view_mat = (m4){{
+      {view_x.x, view_x.y, view_x.z, -v3_dot(view_x, g_camera.pos)},
+      {view_y.x, view_y.y, view_y.z, -v3_dot(view_y, g_camera.pos)},
+      {view_z.x, view_z.y, view_z.z, -v3_dot(view_z, g_camera.pos)},
       {0,   0,    0,   1},
     }};
     
     //and then the object can be moved to view space after multiplying by this matrix to it
-    *_v = v4_to_v3((m4_v4_mul(view_mat, v3_to_v4(*_v)))); //?
+    ret = v4_to_v3((m4_v4_mul(view_mat, v3_to_v4(view_cam_trans)))); //?
+
+    return ret;
 }
 
-void to_ndc(v3 *_v)
+v3 to_ndc(v3 v)
 {
-    f32 aspect = (f32)(SCREEN_WIDTH/(f32)SCREEN_HEIGHT);
-    f32 f = 1.0f / tanf(FOV * 0.5);
+    f32 aspect, f;
+    m4 proj_mat;
+    v3 ret;
 
-    m4 proj_mat = (m4){{
-        {f/aspect, 0,               0,                        0},
-        {0,               f, 0,                        0},
-        {0,               0,               -(FAR+NEAR)/(NEAR-FAR),  (-2*FAR*NEAR)/(NEAR-FAR)},
-        {0,               0,               -1, 0},
+    ret = v;
+    
+    aspect = (f32)(SCREEN_WIDTH/(f32)SCREEN_HEIGHT);
+    f = 1.0f / tanf(FOV * 0.5);
+
+    proj_mat = (m4){{
+        {f/aspect, 0, 0, 0},
+        {0, f, 0, 0},
+        {0, 0, -(FAR+NEAR)/(NEAR-FAR), (-2*FAR*NEAR)/(NEAR-FAR)},
+        {0, 0, -1, 0},
     }};
 
-    *_v = v4_to_v3(v4_norm(m4_v4_mul(proj_mat, v3_to_v4(*_v))));
+    ret = v4_to_v3(v4_norm(m4_v4_mul(proj_mat, v3_to_v4(ret))));
+
+    return ret;
 }
 
-void to_screen(v3 *v)
+v3 to_screen(v3 v)
 {
-    v->x = (v->x + 1.0f) * 0.5f * SCREEN_WIDTH;
-    v->y = (1.0f - v->y) * 0.5f * SCREEN_HEIGHT;
+    v3 ret;
+    ret.x = (v.x + 1.0f) * 0.5f * SCREEN_WIDTH;
+    ret.y = (1.0f - v.y) * 0.5f * SCREEN_HEIGHT;
+
+    return ret;
 }
 
-v3 *world_to_screen(v3 *v)
+v3 world_to_screen(v3 v)
 {
+    v3 ret;
+    ret = v;
+
     printf("ORIGINAL: ");
-    v3_print(*v);
-    to_view_space(v);
+    v3_print(ret);
+    ret = to_view_space(ret);
     printf("VIEW: ");
-    v3_print(*v);
-    if (v->z <= NEAR || v->z >= FAR) return (v3*){0}; //clip
-    to_ndc(v);
+    v3_print(ret);
+    if (ret.z <= NEAR || ret.z >= FAR) return (v3){0}; //clip
+    ret = to_ndc(ret);
     printf("NDC: ");
-    v3_print(*v);
-    to_screen(v);
+    v3_print(ret);
+    ret = to_screen(ret);
     printf("SCREEN: ");
-    v3_print(*v);
+    v3_print(ret);
 
-    return v;
+    return ret;
 }

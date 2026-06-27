@@ -1,7 +1,9 @@
+#ifndef _COMMON_H
+#define _COMMON_H
+
 #include <stdint.h>
 
 #define PI 3.14159265359f
-
 
 #define NEAR 1.0f
 #define FAR 100000.0f
@@ -17,4 +19,4 @@ typedef uint32_t u32;
 typedef int i32;
 typedef float f32;
 
-
+#endif

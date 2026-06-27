@@ -6,9 +6,9 @@
 
 extern camera_t g_camera;
 
-void to_view_space(v3 *_v);
-void to_ndc(v3 *_v);
-void to_screen(v3 *v);
-v3 *world_to_screen(v3 *v);
+v3 to_view_space(v3 v);
+v3 to_ndc(v3 v);
+v3 to_screen(v3 v);
+v3 world_to_screen(v3 v);
 
 #endif

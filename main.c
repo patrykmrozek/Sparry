@@ -58,16 +58,14 @@ int main()
         v3 ps[4] = {p1, p2, p3, p4};
 
         for (int i = 0; i < 4; i++) {
-            if (world_to_screen(&ps[i])) {
-                //printf("P[%d]: ", i);
-                printf("\n");
-                //v3_print(ps[i]);
-                put_pixel_vec(ps[i], 0xFFFFFFFF);
-            }
+            v3 p = world_to_screen(ps[i]);
+            //printf("P[%d]: ", i);
+            printf("\n");
+            //v3_print(ps[i]);
+            put_pixel_vec(p, 0xFFFFFFFF);
         }
         
         render_state_update(&renderer);
-        
         }
 
     render_state_destroy(&renderer);

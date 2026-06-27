@@ -1,6 +1,7 @@
 #include "render.h"
 
-render_state_t render_state_init() {
+render_state_t render_state_init() 
+{
     SDL_Init(SDL_INIT_VIDEO);
 
     render_state_t render_state;
@@ -38,7 +39,9 @@ void render_state_destroy(render_state_t *render_state)
 
 void put_pixel(i32 x, i32 y, i32 z, u32 c)
 {
-    u32 idx = (y * SCREEN_WIDTH) + x;
+    u32 idx;
+
+    idx = (y * SCREEN_WIDTH) + x;
     if (idx < 0 || idx >= SCREEN_HEIGHT*SCREEN_WIDTH) {
         return;
     }
@@ -50,11 +53,13 @@ void put_pixel(i32 x, i32 y, i32 z, u32 c)
 
 void put_pixel_vec(v3 v, u32 c)
 {
+    u32 idx;
+
     v.x = (i32)v.x;
     v.y = (i32)v.y;
     if (v.x < 0 || v.x >= SCREEN_WIDTH || v.y < 0 || v.y >= SCREEN_HEIGHT) return;
 
-    u32 idx = (v.y * SCREEN_WIDTH) + v.x;
+    idx = (v.y * SCREEN_WIDTH) + v.x;
     if (!zbuffer[idx] || zbuffer[idx]> v.z) {
         zbuffer[idx] = v.z;
         framebuffer[idx] = c;
