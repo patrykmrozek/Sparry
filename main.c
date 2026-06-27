@@ -27,18 +27,25 @@ int main()
     m4_print(res);
 
     const uint8_t* keystate = SDL_GetKeyboardState(NULL);
+    f32 delta = 0.1f;
+
     while (game_running == 1) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 game_running = 0;
             }
-            if (keystate[SDL_SCANCODE_W]) g_camera.pos.z += 1.0f;
-            if (keystate[SDL_SCANCODE_S]) g_camera.pos.z -= 1.0f;
-            if (keystate[SDL_SCANCODE_A]) g_camera.pos.x -= 1.0f;
-            if (keystate[SDL_SCANCODE_D]) g_camera.pos.x += 1.0f;
-            if (keystate[SDL_SCANCODE_SPACE]) g_camera.pos.y += 1.0f;
-            if (keystate[SDL_SCANCODE_LSHIFT]) g_camera.pos.y -= 1.0f;
         }
+
+        if (keystate[SDL_SCANCODE_W]) { g_camera.pos.z += delta; g_camera.look_at.z += delta; }
+        if (keystate[SDL_SCANCODE_S]) { g_camera.pos.z -= delta; g_camera.look_at.z -= delta; }
+        if (keystate[SDL_SCANCODE_A]) { g_camera.pos.x -= delta; g_camera.look_at.x -= delta; }
+        if (keystate[SDL_SCANCODE_D]) { g_camera.pos.x += delta; g_camera.look_at.x += delta; }
+        if (keystate[SDL_SCANCODE_SPACE]) { g_camera.pos.y += delta; g_camera.look_at.y += delta; }
+        if (keystate[SDL_SCANCODE_LSHIFT]) { g_camera.pos.y -= delta; g_camera.look_at.y -= delta; }
+        if (keystate[SDL_SCANCODE_LEFT]) { g_camera.look_at.x -= delta; }
+        if (keystate[SDL_SCANCODE_RIGHT]) { g_camera.look_at.x += delta; }
+        if (keystate[SDL_SCANCODE_UP]) { g_camera.look_at.y -= delta; }
+        if (keystate[SDL_SCANCODE_DOWN]) { g_camera.look_at.y += delta; }
         /*
         for (int i = 0; i < 100; i++) {
             framebuffer[10000+i] = 0xFFFF0000;
@@ -58,11 +65,13 @@ int main()
         v3 ps[4] = {p1, p2, p3, p4};
 
         for (int i = 0; i < 4; i++) {
-            v3 p = world_to_screen(ps[i]);
-            //printf("P[%d]: ", i);
-            printf("\n");
-            //v3_print(ps[i]);
-            put_pixel_vec(p, 0xFFFFFFFF);
+            v3 p;
+            if  (world_to_screen(ps[i], &p)) {
+                //printf("P[%d]: ", i);
+                printf("\n");
+                //v3_print(ps[i]);
+                put_pixel_vec(p, 0xFFFFFFFF);
+            }
         }
         
         render_state_update(&renderer);
