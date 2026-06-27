@@ -13,4 +13,4 @@ v3 to_ndc(v3 v);
 v3 to_screen(v3 v);
 bool world_to_screen(v3 v, v3 *ret);
 
-#endif
+#endif //_TRANSFORM_H

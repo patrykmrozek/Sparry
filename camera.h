@@ -10,4 +10,4 @@ typedef struct camera_s {
     v3 look_at;
 } camera_t;
 
-#endif
+#endif //_CAMERA_H

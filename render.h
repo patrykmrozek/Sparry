@@ -20,4 +20,4 @@ void render_state_destroy(render_state_t *render_state);
 void put_pixel(i32 x, i32 y, i32 z, u32 c);
 void put_pixel_vec(v3 v, u32 c);
 
-#endif
+#endif //_RENDER_H

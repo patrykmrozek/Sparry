@@ -195,4 +195,4 @@ static inline v3 v3_lerp(v3 a, v3 b, f32 t)
     };
 }
 
-#endif
+#endif //_LA_H
