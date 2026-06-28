@@ -17,7 +17,12 @@ raster_context_t *raster_context_init(void)
     return raster_ctx;
 }
 
-void put_pixel(raster_context_t *raster_ctx, i32 x, i32 y, i32 z, u32 c)
+void raster_context_destroy(raster_context_t *raster_ctx)
+{
+    free(raster_ctx);
+}
+
+void raster_put_pixel(raster_context_t *raster_ctx, i32 x, i32 y, i32 z, u32 c)
 {
     u32 idx;
 
@@ -31,7 +36,7 @@ void put_pixel(raster_context_t *raster_ctx, i32 x, i32 y, i32 z, u32 c)
     }
 }
 
-void put_pixel_vec(raster_context_t *raster_ctx, v3 v, u32 c)
+void raster_put_pixel_vec(raster_context_t *raster_ctx, v3 v, u32 c)
 {
     u32 idx;
 

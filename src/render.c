@@ -40,6 +40,7 @@ void render_state_destroy(render_state_t *render_state)
 {
     SDL_DestroyRenderer(render_state->renderer);
     SDL_DestroyWindow(render_state->window);
+    raster_context_destroy(render_state->raster_ctx);
     free(render_state);
 }
 
