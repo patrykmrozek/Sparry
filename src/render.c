@@ -53,17 +53,15 @@ void render_frame_begin(render_state_t *render_state)
 
 void render_frame_end(render_state_t *render_state)
 {
-    SDL_UpdateTexture(
-            render_state->texture,
-            NULL, 
-            render_state->raster_ctx->framebuffer, 
-            SCREEN_WIDTH * sizeof(u32));
-    SDL_RenderCopy(
-            render_state->renderer,
-            render_state->texture,
-            NULL,
-            NULL);
-    SDL_RenderPresent(
-            render_state->renderer);
+    SDL_UpdateTexture(render_state->texture,
+                      NULL, 
+                      render_state->raster_ctx->framebuffer, 
+                      SCREEN_WIDTH * sizeof(u32));
+    SDL_RenderCopy(render_state->renderer,
+                   render_state->texture,
+                   NULL,
+                   NULL);
+    SDL_RenderPresent(render_state->renderer);
+
 }
 
