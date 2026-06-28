@@ -13,17 +13,17 @@ int main()
 
     render_state_t *render_state = render_state_init();
     
-    v3 bp1 = {-5, 5, 0};
-    v3 bp2 = {5, 5, 0};
+    v3 bp1 = {-5, 5, 1};
+    v3 bp2 = {5, 5, 2};
 
-    v3 tp1 = {-5, -5, 0};
-    v3 tp2 = {5, -5, 0};
+    v3 tp1 = {-5, -5, 3};
+    v3 tp2 = {5, -5, 4};
 
-    v3 lp1 = {-5, -5, 0};
-    v3 lp2 = {-5, 5, 0};
+    v3 lp1 = {-5, -5, 5};
+    v3 lp2 = {-5, 5, 6};
 
-    v3 rp1 = {5, -5, 0};
-    v3 rp2 = {5, 5, 0};
+    v3 rp1 = {5, -5, 7};
+    v3 rp2 = {5, 5, 8};
 
     SDL_Event event;
     bool game_running = 1;

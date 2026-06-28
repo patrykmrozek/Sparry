@@ -1,4 +1,5 @@
 #include "raster.h"
+#include "common.h"
 #include "transform.h"
 
 void raster_context_clear(raster_context_t *raster_ctx)
@@ -25,27 +26,18 @@ void raster_context_destroy(raster_context_t *raster_ctx)
 
 void raster_put_pixel(raster_context_t *raster_ctx, i32 x, i32 y, i32 z, u32 c)
 {
-    u32 idx;
-
-    idx = (y * SCREEN_WIDTH) + x;
-        if (idx < 0 || idx >= SCREEN_HEIGHT*SCREEN_WIDTH) {
-            return;
-        }
-        if (!raster_ctx->zbuffer[idx] || raster_ctx->zbuffer[idx]> z) {
-            raster_ctx->zbuffer[idx] = z;
-            raster_ctx->framebuffer[idx] = c;
+    if (!IN_BOUNDS(x, y)) return;
+    u32 idx = (y * SCREEN_WIDTH) + x;
+    if (!raster_ctx->zbuffer[idx] || raster_ctx->zbuffer[idx]> z) {
+        raster_ctx->zbuffer[idx] = z;
+        raster_ctx->framebuffer[idx] = c;
     }
 }
 
 void raster_put_pixel_vec(raster_context_t *raster_ctx, v3 v, u32 c)
 {
-    u32 idx;
-
-    v.x = (i32)v.x;
-    v.y = (i32)v.y;
-    if (v.x < 0 || v.x >= SCREEN_WIDTH || v.y < 0 || v.y >= SCREEN_HEIGHT) return;
-
-    idx = (v.y * SCREEN_WIDTH) + v.x;
+    if (!IN_BOUNDS(v.x, v.y)) return;
+    u32 idx = (v.y * SCREEN_WIDTH) + v.x;
     if (!raster_ctx->zbuffer[idx] || raster_ctx->zbuffer[idx]> v.z) {
         raster_ctx->zbuffer[idx] = v.z;
         raster_ctx->framebuffer[idx] = c;
