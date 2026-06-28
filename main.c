@@ -13,7 +13,7 @@ int main()
     SDL_Event event;
     bool game_running = 1;
 
-    render_state_t renderer = render_state_init();
+    render_state_t *render_state = render_state_init();
 
     m4 m = (m4){{
         {2, 0, 0, 0},
@@ -43,18 +43,18 @@ int main()
         }
 
         input_process(keystate);
-        memset(framebuffer, 0, sizeof(framebuffer));
-        memset(zbuffer, 0, sizeof(zbuffer));
+        render_frame_begin(render_state);
 
         for (int i = 0; i < 4; i++) {
             v3 p;
             if  (world_to_screen(ps[i], &p)) {
-                put_pixel_vec(p, 0xFFFFFFFF);
+                put_pixel_vec(render_state, p, 0xFFFFFFFF);
             }
         }
-        render_state_update(&renderer);
+        
+       render_frame_end(render_state); 
     }
 
-    render_state_destroy(&renderer);
+    render_state_destroy(render_state);
     return 0;
 }

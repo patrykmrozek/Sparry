@@ -6,9 +6,9 @@ v3 to_view_space(v3 v)
     m4 view_mat;
     v3 ret;
 
-    view_z = v3_norm(v3_sub(g_camera.pos, g_camera.look_at)); // any objects in front have neg z
-    view_x = v3_norm(v3_cross(view_z, g_camera.up)); // perp of z and up (right) 
-    view_y = v3_norm(v3_cross(view_x, view_z)); // perp of x and z (y)
+    view_z = v3_norm(v3_sub(g_camera.look_at, g_camera.pos)); // any objects in front have pos z
+    view_x = v3_norm(v3_cross(g_camera.up, view_z)); // perp of z and up (right) 
+    view_y = v3_norm(v3_cross(view_z, view_x)); // perp of x and z (y)
     
     // rot world into camera coords
     // translate world relative to camera
@@ -37,8 +37,8 @@ v3 to_ndc(v3 v) //projection
     proj_mat = (m4){{
         {f/aspect, 0, 0, 0},
         {0, f, 0, 0},
-        {0, 0, -(FAR+NEAR)/(NEAR-FAR), (-2*FAR*NEAR)/(NEAR-FAR)},
-        {0, 0, -1, 0},
+        {0, 0, FAR/(FAR-NEAR), -(FAR*NEAR)/(FAR-NEAR)},
+        {0, 0, 1, 0},
     }};
 
     ret = v4_to_v3(v4_norm(m4_v4_mul(proj_mat, v3_to_v4(v))));
@@ -65,7 +65,7 @@ bool world_to_screen(v3 world, v3 *ret)
     view = to_view_space(world);
     printf("VIEW: ");
     v3_print(view);
-    if (view.z > -NEAR || view.z < -FAR) return false; //clip
+    if (view.z < NEAR || view.z > FAR) return false; //clip
     ndc = to_ndc(view);
     printf("NDC: ");
     v3_print(ndc);
