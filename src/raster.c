@@ -1,4 +1,5 @@
 #include "raster.h"
+#include "transform.h"
 
 void raster_context_clear(raster_context_t *raster_ctx)
 {
@@ -50,4 +51,55 @@ void raster_put_pixel_vec(raster_context_t *raster_ctx, v3 v, u32 c)
         raster_ctx->framebuffer[idx] = c;
     }
 }
+
+void raster_put_line(raster_context_t *raster_ctx, v3 p1, v3 p2, u32 color)
+{
+    v3 p1_screen, p2_screen;
+    if (!world_to_screen(p1, &p1_screen)) return;
+    if (!world_to_screen(p2, &p2_screen)) return;
+    printf("p1s = %f %f | p2f = %f %f\n", p1_screen.x, p1_screen.y, p2_screen.x, p2_screen.y);
+
+    i32 err = 0;
+    i32 dx = p2_screen.x - p1_screen.x;
+    i32 dy = p2_screen.y - p1_screen.y;
+    printf("dx: %i, dy: %i\n", dx, dy);
+    int y = p1_screen.y;
+    
+    for (int x = p1_screen.x; x < p2_screen.x; x++) {
+        printf("x: %i, y: %i\n", x, y);
+        printf("\t%d\n", IN_BOUNDS(x, y));
+        if (IN_BOUNDS(x, y)) {
+            raster_put_pixel(raster_ctx, x, y, 0, color);
+        }
+        err += dy;
+        if (err >= dx) {
+            y++;
+            err -= dx;
+        }
+    }
+}
+
+#if 0
+void raster_put_line(raster_context_t *raster_ctx, v3 p1, v3 p2, u32 color)
+{
+    u32 err = 0;
+    u32 dx = p2.x - p1.x;
+    u32 dy = p2.y - p1.y;
+    printf("dx: %i, dy: %i\n", dx, dy);
+    int y = dy;
+    
+    for (int x = p1.x; x < p2.x; x++) {
+        printf("x: %i, y: %i\n", x, y);
+        v3 p_screen;
+        if (!world_to_screen((v3){x, y, 0}, &p_screen)) return;
+        raster_put_pixel(raster_ctx, x, y, 0, color);
+        err += dy;
+        if (err >= dx) {
+            y++;
+            err -= dx;
+        }
+    }
+}
+#endif
+
 
