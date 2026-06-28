@@ -5,30 +5,31 @@ render_state_t *render_state_init()
 {
     SDL_Init(SDL_INIT_VIDEO);
 
-    render_state_t *render_state = (render_state_t*)malloc(sizeof(render_state_t));
+    render_state_t *render_state = 
+        (render_state_t*)malloc(sizeof(render_state_t));
 
-    render_state->window = SDL_CreateWindow(
-        "SPARRY",
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
-        SCREEN_WIDTH,
-        SCREEN_HEIGHT,
-        SDL_WINDOW_SHOWN);
+    render_state->window = 
+        SDL_CreateWindow("SPARRY",
+                         SDL_WINDOWPOS_CENTERED,
+                         SDL_WINDOWPOS_CENTERED,
+                         SCREEN_WIDTH,
+                         SCREEN_HEIGHT,
+                         SDL_WINDOW_SHOWN);
     printf("window: %p\n", render_state->window);
     SDL_RaiseWindow(render_state->window);
-
-    render_state->renderer = SDL_CreateRenderer(
-        render_state->window,
-        -1,
-        SDL_RENDERER_ACCELERATED);
+    
+    render_state->renderer = 
+        SDL_CreateRenderer(render_state->window,
+                           -1,
+                           SDL_RENDERER_ACCELERATED);
     printf("renderer: %p\n", render_state->renderer);
 
-    render_state->texture = SDL_CreateTexture(
-        render_state->renderer,
-        SDL_PIXELFORMAT_BGRA32,
-        SDL_TEXTUREACCESS_STREAMING,
-        SCREEN_WIDTH,
-        SCREEN_HEIGHT);
+    render_state->texture = 
+        SDL_CreateTexture(render_state->renderer,
+                          SDL_PIXELFORMAT_BGRA32,
+                          SDL_TEXTUREACCESS_STREAMING,
+                          SCREEN_WIDTH,
+                          SCREEN_HEIGHT);
     printf("texture: %p\n", render_state->texture);
 
     render_state->raster_ctx = raster_context_init();
