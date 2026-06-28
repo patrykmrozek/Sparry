@@ -48,7 +48,7 @@ int main()
         for (int i = 0; i < 4; i++) {
             v3 p;
             if  (world_to_screen(ps[i], &p)) {
-                put_pixel_vec(render_state, p, 0xFFFFFFFF);
+                put_pixel_vec(render_state->raster_ctx, p, 0xFFFFFFFF);
             }
         }
         

@@ -1,10 +1,11 @@
 #include "render.h"
+#include "raster.h"
 
 render_state_t *render_state_init() 
 {
     SDL_Init(SDL_INIT_VIDEO);
 
-    render_state_t *render_state = malloc(sizeof(render_state_t));
+    render_state_t *render_state = (render_state_t*)malloc(sizeof(render_state_t));
 
     render_state->window = SDL_CreateWindow(
         "SPARRY",
@@ -30,6 +31,8 @@ render_state_t *render_state_init()
         SCREEN_HEIGHT);
     printf("texture: %p\n", render_state->texture);
 
+    render_state->raster_ctx = raster_context_init();
+
     return render_state;
 }
 
@@ -43,11 +46,7 @@ void render_state_destroy(render_state_t *render_state)
 
 void render_frame_begin(render_state_t *render_state)
 {
-    memset(render_state->framebuffer, 0, sizeof(render_state->framebuffer));
-
-    for (int i = 0; i < SCREEN_WIDTH*SCREEN_HEIGHT; i++) {
-        render_state->zbuffer[i] = FLT_MAX;
-    }
+   raster_context_clear(render_state->raster_ctx); 
 }
 
 void render_frame_end(render_state_t *render_state)
@@ -55,7 +54,7 @@ void render_frame_end(render_state_t *render_state)
     SDL_UpdateTexture(
             render_state->texture,
             NULL, 
-            render_state->framebuffer, 
+            render_state->raster_ctx->framebuffer, 
             SCREEN_WIDTH * sizeof(u32));
     SDL_RenderCopy(
             render_state->renderer,
@@ -64,34 +63,5 @@ void render_frame_end(render_state_t *render_state)
             NULL);
     SDL_RenderPresent(
             render_state->renderer);
-}
-
-void put_pixel(render_state_t *render_state, i32 x, i32 y, i32 z, u32 c)
-{
-    u32 idx;
-
-    idx = (y * SCREEN_WIDTH) + x;
-        if (idx < 0 || idx >= SCREEN_HEIGHT*SCREEN_WIDTH) {
-            return;
-        }
-        if (!render_state->zbuffer[idx] || render_state->zbuffer[idx]> z) {
-            render_state->zbuffer[idx] = z;
-            render_state->framebuffer[idx] = c;
-    }
-}
-
-void put_pixel_vec(render_state_t *render_state, v3 v, u32 c)
-{
-    u32 idx;
-
-    v.x = (i32)v.x;
-    v.y = (i32)v.y;
-    if (v.x < 0 || v.x >= SCREEN_WIDTH || v.y < 0 || v.y >= SCREEN_HEIGHT) return;
-
-    idx = (v.y * SCREEN_WIDTH) + v.x;
-    if (!render_state->zbuffer[idx] || render_state->zbuffer[idx]> v.z) {
-        render_state->zbuffer[idx] = v.z;
-        render_state->framebuffer[idx] = c;
-    }
 }
 

@@ -12,9 +12,6 @@
 #define DEG_TO_RAD(_d) ((_d) * (PI / 180)) 
 #define RAD_TO_DEG(_d) ((_d) * (180 / PI))
 
-#define SCREEN_WIDTH 600
-#define SCREEN_HEIGHT 600
-
 typedef uint32_t u32;
 typedef int i32;
 typedef float f32;
