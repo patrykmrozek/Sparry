@@ -13,7 +13,8 @@ void raster_context_clear(raster_context_t *raster_ctx)
 
 raster_context_t *raster_context_init(void)
 {
-    raster_context_t *raster_ctx = (raster_context_t*)malloc(sizeof(*raster_ctx));
+    raster_context_t *raster_ctx = 
+        (raster_context_t*)malloc(sizeof(*raster_ctx));
     raster_context_clear(raster_ctx);
 
     return raster_ctx;
@@ -49,7 +50,8 @@ void raster_put_line(raster_context_t *raster_ctx, v3 p1, v3 p2, u32 color)
     v3 p1_screen, p2_screen;
     if (!world_to_screen(p1, &p1_screen)) return;
     if (!world_to_screen(p2, &p2_screen)) return;
-    printf("p1s = %f %f | p2f = %f %f\n", p1_screen.x, p1_screen.y, p2_screen.x, p2_screen.y);
+    printf("p1s = %f %f | p2f = %f %f\n", 
+            p1_screen.x, p1_screen.y, p2_screen.x, p2_screen.y);
 
     i32 err = 0;
     i32 dx = p2_screen.x - p1_screen.x;
