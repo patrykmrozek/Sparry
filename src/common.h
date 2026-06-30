@@ -1,6 +1,11 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
+#define CELP_STRIP_PREFIX
+#include "../include/celp.h"
+#undef log
+#define LOG celp_log
+
 #include <stdint.h>
 
 #define PI 3.14159265359f

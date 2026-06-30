@@ -1,4 +1,5 @@
 #include "transform.h"
+#include "common.h"
 
 v3 to_view_space(v3 v)
 {
@@ -60,18 +61,14 @@ bool world_to_screen(v3 world, v3 *ret)
 {
     v3 view, ndc, screen;
 
-    printf("ORIGINAL: ");
-    v3_print(world);
+    LOG(LOG_LEVEL_DEBUG, "ORIGINAL: " V3_STR(world));
     view = to_view_space(world);
-    printf("VIEW: ");
-    v3_print(view);
+    LOG(LOG_LEVEL_DEBUG, "VIEW: " V3_STR(view));
     if (view.z < NEAR || view.z > FAR) return false; //clip
     ndc = to_ndc(view);
-    printf("NDC: ");
-    v3_print(ndc);
+    LOG(LOG_LEVEL_DEBUG, "NDC: " V3_STR(ndc));
     screen = to_screen(ndc);
-    printf("SCREEN: ");
-    v3_print(screen);
+    LOG(LOG_LEVEL_DEBUG, "SCREEN: " V3_STR(screen));
 
     *ret = screen;
     return true;

@@ -50,6 +50,7 @@
 typedef struct v3_s {
     f32 x,y,z;
 } v3;
+#define V3_STR(v) "{ %f, %f, %f }", (v).x, (v).y, (v).z
 static inline v3 v3_init(f32 x, f32 y, f32 z)
 {
     return (v3){

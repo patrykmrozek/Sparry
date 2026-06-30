@@ -15,14 +15,14 @@ render_state_t *render_state_init()
                          SCREEN_WIDTH,
                          SCREEN_HEIGHT,
                          SDL_WINDOW_SHOWN);
-    printf("window: %p\n", render_state->window);
+    LOG(LOG_LEVEL_INFO, "window: %p\n", render_state->window);
     SDL_RaiseWindow(render_state->window);
     
     render_state->renderer = 
         SDL_CreateRenderer(render_state->window,
                            -1,
                            SDL_RENDERER_ACCELERATED);
-    printf("renderer: %p\n", render_state->renderer);
+    LOG(LOG_LEVEL_INFO, "renderer: %p\n", render_state->renderer);
 
     render_state->texture = 
         SDL_CreateTexture(render_state->renderer,
@@ -30,7 +30,7 @@ render_state_t *render_state_init()
                           SDL_TEXTUREACCESS_STREAMING,
                           SCREEN_WIDTH,
                           SCREEN_HEIGHT);
-    printf("texture: %p\n", render_state->texture);
+    LOG(LOG_LEVEL_INFO, "texture: %p\n", render_state->texture);
 
     render_state->raster_ctx = raster_context_init();
 

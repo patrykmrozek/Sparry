@@ -1,4 +1,5 @@
 OUT = sparry
+#add -DCELP_DEBUG to enable logging
 $(OUT):
 	gcc \
 		src/main.c \
@@ -8,6 +9,7 @@ $(OUT):
 		src/transform.c \
 		src/input.c \
 		\
+		-Iinclude\
 		-lSDL2 -lm \
 		-Wall -Wextra \
 		-o $(OUT) 

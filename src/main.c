@@ -3,7 +3,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+
+#define CELP_IMPLEMENTATION
+#define CELP_STRIP_PREFIX
+
 #include "common.h"
+#undef log
+#define LOG celp_log
+
 #include "render.h"
 #include "input.h"
 
