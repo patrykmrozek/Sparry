@@ -29,6 +29,9 @@ int main()
 
     SDL_Event event;
     bool game_running = 1;
+    LOG(LOG_LEVEL_TRACE, "game_running: %d", 
+            __FILE__, __FUNCTION__, __LINE__,
+            game_running);
 
     const uint8_t* keystate = SDL_GetKeyboardState(NULL);
     while (game_running == 1) {

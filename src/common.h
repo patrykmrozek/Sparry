@@ -2,7 +2,7 @@
 #define _COMMON_H
 
 #define CELP_STRIP_PREFIX
-#include "../include/celp.h"
+#include "../../celp/celp.h"
 #undef log
 #define LOG celp_log
 
