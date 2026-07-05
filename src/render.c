@@ -7,6 +7,12 @@ render_state_t *render_state_init()
 
     render_state_t *render_state = 
         (render_state_t*)malloc(sizeof(render_state_t));
+    if (!render_state) {
+        LOG(LOG_LEVEL_ERROR,
+            __FILE__, __FUNCTION__, __LINE__,
+            "render state allocation failed");
+        return NULL;
+    }
 
     render_state->window = 
         SDL_CreateWindow("SPARRY",

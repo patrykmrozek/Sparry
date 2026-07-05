@@ -15,6 +15,12 @@ raster_context_t *raster_context_init(void)
 {
     raster_context_t *raster_ctx = 
         (raster_context_t*)malloc(sizeof(*raster_ctx));
+    if (!raster_ctx) {
+        LOG(LOG_LEVEL_ERROR,
+            __FILE__, __FUNCTION__, __LINE__,
+            "raster context init allocation failed");
+        return NULL;
+    }
     raster_context_clear(raster_ctx);
 
     return raster_ctx;
