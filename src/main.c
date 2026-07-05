@@ -1,3 +1,4 @@
+#include "result.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -13,7 +14,14 @@ int main()
 {
     printf("SPARRY\n");
 
-    render_state_t *render_state = render_state_init();
+    render_state_t *render_state;
+    result_t res = render_state_init(&render_state);
+    if (res != RESULT_OK) {
+        LOG(LOG_LEVEL_ERROR,
+            __FILE__, __FUNCTION__, __LINE__,
+            "main render state creation failed");
+        return 1;
+    }
     
     v3 bp1 = {-5, 5, 1};
     v3 bp2 = {5, 5, 2};
@@ -29,12 +37,8 @@ int main()
 
     SDL_Event event;
     bool game_running = 1;
-    LOG(LOG_LEVEL_TRACE, 
-            __FILE__, __FUNCTION__, __LINE__,
-            "game_running: %d",  
-            game_running);
-
     const uint8_t* keystate = SDL_GetKeyboardState(NULL);
+
     while (game_running == 1) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {

@@ -11,7 +11,7 @@ void raster_context_clear(raster_context_t *raster_ctx)
     }
 }
 
-raster_context_t *raster_context_init(void)
+result_t raster_context_init(raster_context_t **out_raster_ctx)
 {
     raster_context_t *raster_ctx = 
         (raster_context_t*)malloc(sizeof(*raster_ctx));
@@ -19,11 +19,12 @@ raster_context_t *raster_context_init(void)
         LOG(LOG_LEVEL_ERROR,
             __FILE__, __FUNCTION__, __LINE__,
             "raster context init allocation failed");
-        return NULL;
+        return RESULT_ERROR_ALLOC;
     }
     raster_context_clear(raster_ctx);
+    *out_raster_ctx = raster_ctx;
 
-    return raster_ctx;
+    return RESULT_OK;
 }
 
 void raster_context_destroy(raster_context_t *raster_ctx)
@@ -31,9 +32,15 @@ void raster_context_destroy(raster_context_t *raster_ctx)
     free(raster_ctx);
 }
 
-void raster_put_pixel(raster_context_t *raster_ctx, i32 x, i32 y, i32 z, u32 c)
+void raster_put_pixel(raster_context_t *raster_ctx, 
+                      i32 x, i32 y, f32 z, u32 c)
 {
-    if (!IN_BOUNDS(x, y)) return;
+    if (!IN_BOUNDS(x, y)) {
+        LOG(LOG_LEVEL_DEBUG,
+            "pixel out of bounds: {%d, %d}",
+            x, y);
+        return;
+    }
     u32 idx = (y * SCREEN_WIDTH) + x;
     if (!raster_ctx->zbuffer[idx] || raster_ctx->zbuffer[idx]> z) {
         raster_ctx->zbuffer[idx] = z;
@@ -43,15 +50,24 @@ void raster_put_pixel(raster_context_t *raster_ctx, i32 x, i32 y, i32 z, u32 c)
 
 void raster_put_pixel_vec(raster_context_t *raster_ctx, v3 v, u32 c)
 {
-    if (!IN_BOUNDS(v.x, v.y)) return;
-    u32 idx = (v.y * SCREEN_WIDTH) + v.x;
+    i32 x = (i32)v.x;
+    i32 y = (i32)v.y;
+
+    if (!IN_BOUNDS(x, y)) {
+        LOG(LOG_LEVEL_DEBUG,
+            "pixel out of bounds: {%d, %d}",
+            x, y);
+        return;
+    }
+    u32 idx = (y * SCREEN_WIDTH) + x;
     if (!raster_ctx->zbuffer[idx] || raster_ctx->zbuffer[idx]> v.z) {
         raster_ctx->zbuffer[idx] = v.z;
         raster_ctx->framebuffer[idx] = c;
     }
 }
 
-void raster_put_line(raster_context_t *raster_ctx, v3 p1, v3 p2, u32 color)
+void raster_put_line(raster_context_t *raster_ctx,
+                     v3 p1, v3 p2, u32 color)
 {
     v3 p1_screen, p2_screen;
     if (!world_to_screen(p1, &p1_screen)) return;

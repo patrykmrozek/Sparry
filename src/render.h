@@ -2,6 +2,7 @@
 #define _RENDERER_H
 
 #include "raster.h"
+#include "result.h"
 
 typedef struct render_state_s {
     SDL_Window *window;
@@ -11,7 +12,7 @@ typedef struct render_state_s {
     raster_context_t *raster_ctx;
 } render_state_t;
 
-render_state_t *render_state_init();
+result_t render_state_init(render_state_t **out_render_state); 
 void render_state_update(render_state_t *render_state);
 void render_state_destroy(render_state_t *render_state);
 void render_frame_begin(render_state_t *render_state);
