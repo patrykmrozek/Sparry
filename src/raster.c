@@ -66,15 +66,70 @@ void raster_put_pixel_vec(raster_context_t *raster_ctx, v3 v, u32 c)
     }
 }
 
-//slope <= 1
-static inline void _raster_put_line_low(raster_context_t *raster_ctx,
-                                        i32 x0, i32 y0,
-                                        i32 x1, i32 y1,
-                                        u32 c)
+//this function works as follows: 
+//youve got two points, p0, p1,
+//depending on the slope of the
+//line between these points, we 
+//do one of these two things:
+//(1) for every x check if we change y by 1
+//              OR
+//(2) for every y check if we change x by 1
+
+//1 is the default, but we check `is_steep`
+//in which case we swap the x and y to
+//enable us to do 2.
+ 
+//The second SWAP makes sure that we 
+//are always drawing left->right
+
+//`diff` keeps track of how much we
+//have deviated from our original
+//axis, which lets us know if we 
+//should change the second axis by 1.
+
+//The 'first' axis is the one being
+//controlled in the for loop, and
+//the `second` axis is the one 
+//that changes by one when the 
+//diff deviation surpasses the
+//delta of the second axis, then
+//we subtract 2*(delta(2)-delta(1))
+
+//when we're putting pixels, we
+//then must check if is_steep, in 
+//which case we must put the pixels
+//in reverse order essentially undo
+//the swap above.
+void raster_put_line(raster_context_t *raster_ctx,
+                     v3 p0, v3 p1, u32 c)
 {
+    v3 p0s, p1s;
+    if (!world_to_screen(p0, &p0s)) return;
+    if (!world_to_screen(p1, &p1s)) return;
+    LOG(LOG_LEVEL_DEBUG,
+        "p0s = %f %f | p1f = %f %f", 
+        p0s.x, p0s.y, p1s.x, p1s.y);
+
+    i32 x0 = (i32)p0s.x;
+    i32 y0 = (i32)p0s.y;
+    i32 x1 = (i32)p1s.x;
+    i32 y1 = (i32)p1s.y;
+
+    bool is_steep = abs(y1 - y0) > abs(x1 - x0); 
+
+    if (is_steep) {
+        SWAP(x0, y0);
+        SWAP(x1, y1);
+    }
+
+    if (x0 > x1) {
+        SWAP(x0, x1);
+        SWAP(y0, y1);
+    }
+
     i32 dx = x1 - x0;
-    i32 dy = y1 - y0;
-    i32 yi = 1;
+    i32 dy = abs(y1 - y0);
+    i32 yi = (y1 - y0 < 0) ? -1 : 1;
 
     if (dy < 0) {
         yi = -1;
@@ -85,8 +140,17 @@ static inline void _raster_put_line_low(raster_context_t *raster_ctx,
     i32 y = y0;
 
     for (i32 x = x0; x < x1; x++) {
-        if (IN_BOUNDS(x, y)) {
-            raster_put_pixel(raster_ctx, x, y, 0, c);
+        LOG(LOG_LEVEL_DEBUG,
+             "DIFF: %d",
+             diff);
+        if (is_steep) {
+            if (IN_BOUNDS(y, x)) {
+                raster_put_pixel(raster_ctx, y, x, 0, c);
+            }
+        } else {
+            if (IN_BOUNDS(x, y)) {
+                raster_put_pixel(raster_ctx, x, y, 0, c);
+            }
         }
         if (diff >= 0) {
             y += yi;
@@ -96,76 +160,4 @@ static inline void _raster_put_line_low(raster_context_t *raster_ctx,
         }
     }
 }
-
-//when slope >= 1
-static inline void _raster_put_line_high(raster_context_t *raster_ctx,
-                                         i32 x0, i32 y0,
-                                         i32 x1, i32 y1,
-                                         u32 c)
-{
-    i32 dx = x1 - x0;
-    i32 dy = y1 - y0;
-    i32 xi = 1;
-
-    if (dx < 0) {
-        xi = -1;
-        dx = -dx;
-    }
-
-    i32 diff = (2 * dx) - dy;
-    i32 x = x0;
-
-    for (i32 y = y0; y < y1; y++) {
-        if (IN_BOUNDS(x, y)) {
-            raster_put_pixel(raster_ctx, x, y, 0, c);
-        }
-        if (diff >= 0) {
-            x += xi;
-            diff += (2 * (dx - dy));
-        } else {
-            diff += (2 * dx);
-        }
-    }
-}
-
-void raster_put_line(raster_context_t *raster_ctx,
-                     v3 p0, v3 p1, u32 color)
-{
-    v3 p0s, p1s;
-    if (!world_to_screen(p0, &p0s)) return;
-    if (!world_to_screen(p1, &p1s)) return;
-    LOG(LOG_LEVEL_DEBUG, "p0s = %f %f | p1f = %f %f", 
-            p0s.x, p0s.y, p1s.x, p1s.y);
-    i32 p0sx = (i32)p0s.x;
-    i32 p0sy = (i32)p0s.y;
-    i32 p1sx = (i32)p1s.x;
-    i32 p1sy = (i32)p1s.y;
-
-    if (abs(p1sy - p0sy) < abs(p1sx - p0sx)) {
-        if (p0sx > p1sx) {
-            _raster_put_line_low(raster_ctx,
-                                 p1sx, p1sy,
-                                 p0sx, p0sy,
-                                 color);
-        } else {
-            _raster_put_line_low(raster_ctx,
-                                 p0sx, p0sy,
-                                 p1sx, p1sy,
-                                 color);
-        }
-    } else {
-        if (p0sy > p1sy) {
-            _raster_put_line_high(raster_ctx,
-                                  p1sx, p1sy,
-                                  p0sx, p0sy,
-                                  color);
-        } else {
-            _raster_put_line_high(raster_ctx,
-                                  p0sx, p0sy,
-                                  p1sx, p1sy,
-                                  color);
-        }
-    }
-}
-
 

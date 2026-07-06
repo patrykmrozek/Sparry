@@ -20,6 +20,13 @@
 #define DEG_TO_RAD(_d) ((_d) * (PI / 180)) 
 #define RAD_TO_DEG(_d) ((_d) * (180 / PI))
 
+#define SWAP(a, b) \
+    do { \
+        typeof((a)) __t = (a); \
+        (a) = (b); \
+        (b) = __t; \
+    } while (0);
+
 #define IN_BOUNDS(_x, _y) ((_x) >= 0 && (_x) < SCREEN_WIDTH && (_y) >= 0 && (_y) < SCREEN_HEIGHT)
 
 typedef uint32_t u32;

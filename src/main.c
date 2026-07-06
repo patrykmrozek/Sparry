@@ -23,17 +23,15 @@ int main()
         return 1;
     }
     
-    v3 bp1 = {-5, 5, 1};
-    v3 bp2 = {5, 5, 2};
+    v3 b1 = {-10, -10,  10};
+    v3 b2 = { 10, -10,  10};
+    v3 b3 = { 10, -10, -10};
+    v3 b4 = {-10, -10, -10};
 
-    v3 tp1 = {-5, -5, 3};
-    v3 tp2 = {5, -5, 4};
-
-    v3 lp1 = {-5, -5, 5};
-    v3 lp2 = {-5, 5, 6};
-
-    v3 rp1 = {5, -5, 7};
-    v3 rp2 = {5, 5, 8};
+    v3 t1 = {-10,  10,  10};
+    v3 t2 = { 10,  10,  10};
+    v3 t3 = { 10,  10, -10};
+    v3 t4 = {-10,  10, -10};
 
     SDL_Event event;
     bool game_running = 1;
@@ -49,10 +47,20 @@ int main()
         input_process(keystate);
         render_frame_begin(render_state);
         {
-            raster_put_line(render_state->raster_ctx, bp1, bp2, 0xFFFFFFFF);
-            raster_put_line(render_state->raster_ctx, tp1, tp2, 0xFFFFFFFF);
-            raster_put_line(render_state->raster_ctx, lp1, lp2, 0xFFFFFFFF);
-            raster_put_line(render_state->raster_ctx, rp1, rp2, 0xFFFFFFFF);
+            raster_put_line(render_state->raster_ctx, b1, b2, 0xFFFFFFFF);
+            raster_put_line(render_state->raster_ctx, b2, b3, 0xFFFFFFFF);
+            raster_put_line(render_state->raster_ctx, b3, b4, 0xFFFFFFFF);
+            raster_put_line(render_state->raster_ctx, b4, b1, 0xFFFFFFFF);
+
+            raster_put_line(render_state->raster_ctx, t1, t2, 0xFFFFFFFF);
+            raster_put_line(render_state->raster_ctx, t2, t3, 0xFFFFFFFF);
+            raster_put_line(render_state->raster_ctx, t3, t4, 0xFFFFFFFF);
+            raster_put_line(render_state->raster_ctx, t4, t1, 0xFFFFFFFF);
+
+            raster_put_line(render_state->raster_ctx, b1, t1, 0xFFFFFFFF);
+            raster_put_line(render_state->raster_ctx, b2, t2,  0xFFFFFFFF);
+            raster_put_line(render_state->raster_ctx, b3, t3, 0xFFFFFFFF);
+            raster_put_line(render_state->raster_ctx, b4, t4, 0xFFFFFFFF);
         }
         render_frame_end(render_state); 
     }
