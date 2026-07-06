@@ -66,56 +66,106 @@ void raster_put_pixel_vec(raster_context_t *raster_ctx, v3 v, u32 c)
     }
 }
 
-void raster_put_line(raster_context_t *raster_ctx,
-                     v3 p1, v3 p2, u32 color)
+//slope <= 1
+static inline void _raster_put_line_low(raster_context_t *raster_ctx,
+                                        i32 x0, i32 y0,
+                                        i32 x1, i32 y1,
+                                        u32 c)
 {
-    v3 p1_screen, p2_screen;
-    if (!world_to_screen(p1, &p1_screen)) return;
-    if (!world_to_screen(p2, &p2_screen)) return;
-    LOG(LOG_LEVEL_DEBUG, "p1s = %f %f | p2f = %f %f", 
-            p1_screen.x, p1_screen.y, p2_screen.x, p2_screen.y);
+    i32 dx = x1 - x0;
+    i32 dy = y1 - y0;
+    i32 yi = 1;
 
-    i32 err = 0;
-    i32 dx = p2_screen.x - p1_screen.x;
-    i32 dy = p2_screen.y - p1_screen.y;
-    LOG(LOG_LEVEL_DEBUG, "dx: %i, dy: %i", dx, dy);
-    int y = p1_screen.y;
+    if (dy < 0) {
+        yi = -1;
+        dy = -dy;
+    }
     
-    for (int x = p1_screen.x; x < p2_screen.x; x++) {
-        LOG(LOG_LEVEL_DEBUG, "x: %i, y: %i", x, y);
-        LOG(LOG_LEVEL_DEBUG, "\t%d", IN_BOUNDS(x, y));
+    i32 diff = (2 * dy) - dx;
+    i32 y = y0;
+
+    for (i32 x = x0; x < x1; x++) {
         if (IN_BOUNDS(x, y)) {
-            raster_put_pixel(raster_ctx, x, y, 0, color);
+            raster_put_pixel(raster_ctx, x, y, 0, c);
         }
-        err += dy;
-        if (err >= dx) {
-            y++;
-            err -= dx;
+        if (diff >= 0) {
+            y += yi;
+            diff += (2 * (dy - dx));
+        } else {
+            diff += (2 * dy);
         }
     }
 }
 
-#if 0
-void raster_put_line(raster_context_t *raster_ctx, v3 p1, v3 p2, u32 color)
+//when slope >= 1
+static inline void _raster_put_line_high(raster_context_t *raster_ctx,
+                                         i32 x0, i32 y0,
+                                         i32 x1, i32 y1,
+                                         u32 c)
 {
-    u32 err = 0;
-    u32 dx = p2.x - p1.x;
-    u32 dy = p2.y - p1.y;
-    LOG(LOG_LEVEL_DEBUG, "dx: %i, dy: %i\n", dx, dy);
-    int y = dy;
-    
-    for (int x = p1.x; x < p2.x; x++) {
-        LOG(LOG_LEVEL_DEBUG, "x: %i, y: %i\n", x, y);
-        v3 p_screen;
-        if (!world_to_screen((v3){x, y, 0}, &p_screen)) return;
-        raster_put_pixel(raster_ctx, x, y, 0, color);
-        err += dy;
-        if (err >= dx) {
-            y++;
-            err -= dx;
+    i32 dx = x1 - x0;
+    i32 dy = y1 - y0;
+    i32 xi = 1;
+
+    if (dx < 0) {
+        xi = -1;
+        dx = -dx;
+    }
+
+    i32 diff = (2 * dx) - dy;
+    i32 x = x0;
+
+    for (i32 y = y0; y < y1; y++) {
+        if (IN_BOUNDS(x, y)) {
+            raster_put_pixel(raster_ctx, x, y, 0, c);
+        }
+        if (diff >= 0) {
+            x += xi;
+            diff += (2 * (dx - dy));
+        } else {
+            diff += (2 * dx);
         }
     }
 }
-#endif
+
+void raster_put_line(raster_context_t *raster_ctx,
+                     v3 p0, v3 p1, u32 color)
+{
+    v3 p0s, p1s;
+    if (!world_to_screen(p0, &p0s)) return;
+    if (!world_to_screen(p1, &p1s)) return;
+    LOG(LOG_LEVEL_DEBUG, "p0s = %f %f | p1f = %f %f", 
+            p0s.x, p0s.y, p1s.x, p1s.y);
+    i32 p0sx = (i32)p0s.x;
+    i32 p0sy = (i32)p0s.y;
+    i32 p1sx = (i32)p1s.x;
+    i32 p1sy = (i32)p1s.y;
+
+    if (abs(p1sy - p0sy) < abs(p1sx - p0sx)) {
+        if (p0sx > p1sx) {
+            _raster_put_line_low(raster_ctx,
+                                 p1sx, p1sy,
+                                 p0sx, p0sy,
+                                 color);
+        } else {
+            _raster_put_line_low(raster_ctx,
+                                 p0sx, p0sy,
+                                 p1sx, p1sy,
+                                 color);
+        }
+    } else {
+        if (p0sy > p1sy) {
+            _raster_put_line_high(raster_ctx,
+                                  p1sx, p1sy,
+                                  p0sx, p0sy,
+                                  color);
+        } else {
+            _raster_put_line_high(raster_ctx,
+                                  p0sx, p0sy,
+                                  p1sx, p1sy,
+                                  color);
+        }
+    }
+}
 
 
