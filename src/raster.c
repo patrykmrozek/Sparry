@@ -130,11 +130,6 @@ void raster_put_line(raster_context_t *raster_ctx,
     i32 dx = x1 - x0;
     i32 dy = abs(y1 - y0);
     i32 yi = (y1 - y0 < 0) ? -1 : 1;
-
-    if (dy < 0) {
-        yi = -1;
-        dy = -dy;
-    }
     
     i32 diff = (2 * dy) - dx;
     i32 y = y0;
