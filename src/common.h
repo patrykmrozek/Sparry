@@ -1,8 +1,8 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
+#define CELP_MATH
 #define CELP_STRIP_PREFIX
-#include "../../celp/celp_math.h"
 #include "../../celp/celp.h"
 #undef log
 #define LOG celp_log
@@ -21,14 +21,11 @@
 #define DEG_TO_RAD(_d) ((_d) * (PI / 180)) 
 #define RAD_TO_DEG(_d) ((_d) * (180 / PI))
 
-#define SWAP(a, b) \
-    do { \
-        typeof((a)) __t = (a); \
-        (a) = (b); \
-        (b) = __t; \
-    } while (0);
-
-#define IN_BOUNDS(_x, _y) ((_x) >= 0 && (_x) < SCREEN_WIDTH && (_y) >= 0 && (_y) < SCREEN_HEIGHT)
+#define IN_BOUNDS(_x, _y) \
+    ((_x) >= 0 && \
+     (_x) < SCREEN_WIDTH && \
+     (_y) >= 0 && \
+     (_y) < SCREEN_HEIGHT)
 
 typedef uint32_t u32;
 typedef int i32;
