@@ -6,10 +6,27 @@ v3 to_view_space(v3 v)
     v3 view_x, view_y, view_z;
     m4 view_mat;
     v3 ret;
+    v3 sub = v3_sub(g_camera.look_at, g_camera.pos);
+    v3 norm = v3_norm(sub);
 
     view_z = v3_norm(v3_sub(g_camera.look_at, g_camera.pos)); // any objects in front have pos z
+    LOG(LOG_LEVEL_DEBUG,
+         "\nVIEW_Z: %f %f %f = normalize({%f %f %f} - {%f %f %f})"
+         "\nsub = %f %f %f"
+         "\nnorm = %f %f %f\n",
+         view_z.x, view_z.y, view_z.z, 
+         g_camera.look_at.x, g_camera.look_at.y, g_camera.look_at.y,
+         g_camera.pos.x, g_camera.pos.y, g_camera.pos.z,
+         sub.x, sub.y, sub.z,
+         norm.x, norm.y, norm.z);
     view_x = v3_norm(v3_cross(g_camera.up, view_z)); // perp of z and up (right) 
+    LOG(LOG_LEVEL_DEBUG,
+         "VIEW_X: %f %f %f",
+         view_x.x, view_x.y, view_x.z);
     view_y = v3_norm(v3_cross(view_z, view_x)); // perp of x and z (y)
+    LOG(LOG_LEVEL_DEBUG,
+         "VIEW_Y: %f %f %f",
+         view_y.x, view_y.y, view_y.z);
     
     // rot world into camera coords
     // translate world relative to camera
@@ -19,9 +36,19 @@ v3 to_view_space(v3 v)
       {view_z.x, view_z.y, view_z.z, -v3_dot(view_z, g_camera.pos)},
       {0,   0,    0,   1},
     }};
-    
+
+    LOG(LOG_LEVEL_DEBUG, "VIEW_MAT: ");
+    m4_print(view_mat);
     //and then the object can be moved to view space after multiplying by this matrix to it
     ret = v4_to_v3((m4_v4_mul(view_mat, v3_to_v4(v)))); //?
+
+    LOG(LOG_LEVEL_DEBUG,
+        "ret: %f %f %f",
+        ret.x, ret.y, ret.z);
+
+    printf("camera = "V3F_STR(g_camera.pos)); 
+
+printf("dot = %f\n", v3_dot(view_z, g_camera.pos));
 
     return ret;
 }
@@ -61,14 +88,14 @@ bool world_to_screen(v3 world, v3 *ret)
 {
     v3 view, ndc, screen;
 
-    LOG(LOG_LEVEL_DEBUG, "ORIGINAL: " V3_STR(world));
+    LOG(LOG_LEVEL_DEBUG, "ORIGINAL: " V3F_STR(world));
     view = to_view_space(world);
-    LOG(LOG_LEVEL_DEBUG, "VIEW: " V3_STR(view));
+    LOG(LOG_LEVEL_DEBUG, "VIEW: " V3F_STR(view));
     if (view.z < NEAR || view.z > FAR) return false; //clip
     ndc = to_ndc(view);
-    LOG(LOG_LEVEL_DEBUG, "NDC: " V3_STR(ndc));
+    LOG(LOG_LEVEL_DEBUG, "NDC: " V3F_STR(ndc));
     screen = to_screen(ndc);
-    LOG(LOG_LEVEL_DEBUG, "SCREEN: " V3_STR(screen));
+    LOG(LOG_LEVEL_DEBUG, "SCREEN: " V3F_STR(screen));
 
     *ret = screen;
     return true;

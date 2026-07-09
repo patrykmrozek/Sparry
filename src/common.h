@@ -2,17 +2,9 @@
 #define _COMMON_H
 
 #define CELP_STRIP_PREFIX
+#include "../../celp/celp_math.h"
 #include "../../celp/celp.h"
 #undef log
-
-//need to pivot to just using
-//celp vector math because of the clashing
-//maybe port this whole file over?
-#undef v3_add
-#undef v3_sub
-#undef v3_scale
-#undef v3_dot
-#undef v3_cross
 #define LOG celp_log
 
 #include <stdint.h>
