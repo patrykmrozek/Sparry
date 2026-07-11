@@ -27,8 +27,4 @@
      (_y) >= 0 && \
      (_y) < SCREEN_HEIGHT)
 
-typedef uint32_t u32;
-typedef int i32;
-typedef float f32;
-
 #endif //_COMMON_H
