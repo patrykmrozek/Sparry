@@ -53,17 +53,7 @@ void raster_put_pixel_vec(raster_context_t *raster_ctx, v3 v, u32 c)
     i32 x = (i32)v.x;
     i32 y = (i32)v.y;
 
-    if (!IN_BOUNDS(x, y)) {
-        LOG(LOG_LEVEL_DEBUG,
-            "pixel out of bounds: {%d, %d}",
-            x, y);
-        return;
-    }
-    u32 idx = (y * SCREEN_WIDTH) + x;
-    if (!raster_ctx->zbuffer[idx] || raster_ctx->zbuffer[idx]> v.z) {
-        raster_ctx->zbuffer[idx] = v.z;
-        raster_ctx->framebuffer[idx] = c;
-    }
+    raster_put_pixel(raster_ctx, x, y, v.z, c);
 }
 
 //this function works as follows: 
@@ -138,15 +128,10 @@ void raster_put_line(raster_context_t *raster_ctx,
         LOG(LOG_LEVEL_DEBUG,
              "DIFF: %d",
              diff);
-        if (is_steep) {
-            if (IN_BOUNDS(y, x)) {
-                raster_put_pixel(raster_ctx, y, x, 0, c);
-            }
-        } else {
-            if (IN_BOUNDS(x, y)) {
-                raster_put_pixel(raster_ctx, x, y, 0, c);
-            }
-        }
+
+        if (is_steep) raster_put_pixel(raster_ctx, y, x, 0, c);
+        else          raster_put_pixel(raster_ctx, x, y, 0, c);
+
         if (diff >= 0) {
             y += yi;
             diff += (2 * (dy - dx));

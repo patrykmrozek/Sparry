@@ -7,9 +7,12 @@ v3 to_view_space(v3 v)
     m4 view_mat;
     v3 ret;
 
-    view_z = v3_norm(v3_sub(g_camera.look_at, g_camera.pos)); // any objects in front have pos z
-    view_x = v3_norm(v3_cross(g_camera.up, view_z)); // perp of z and up (right) 
-    view_y = v3_norm(v3_cross(view_z, view_x)); // perp of x and z (y)
+    // any objects in front have pos z
+    view_z = v3_norm(v3_sub(g_camera.look_at, g_camera.pos)); 
+    // perp of z and up (right)
+    view_x = v3_norm(v3_cross(g_camera.up, view_z));  
+    // perp of x and z (y)
+    view_y = v3_norm(v3_cross(view_z, view_x)); 
     
     // rot world into camera coords
     // translate world relative to camera
@@ -20,7 +23,7 @@ v3 to_view_space(v3 v)
       {0,   0,    0,   1},
     }};
 
-    ret = v4_to_v3((m4_v4_mul(view_mat, v3_to_v4(v, f32))), f32); //?
+    ret = v4_to_v3(m4_v4_mul(view_mat, v3_to_v4(v, f32)), f32); //?
 
     return ret;
 }

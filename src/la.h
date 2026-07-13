@@ -19,22 +19,6 @@ static inline void v4_print(v4 v)
     printf("{ %f, %f, %f, %f }\n", v.x, v.y, v.z, v.w);
 }
 
-static inline v4 m4_v4_mul(m4 m, v4 v)
-{
-    f32 out[4];
-    for (int row = 0; row < 4; row++) {
-        //found issue with celp dot macro..
-        //having multiple, comma separated arguments 
-        //in this function (even though they are
-        //all technically one v4) confuse the preprocessor
-        //and this fails
-        out[row] = v4_dot(((v4)
-                    {m.v[row][0], m.v[row][1],
-                     m.v[row][2], m.v[row][3]}),
-                     v);
-    }
-    return (v4){out[0], out[1], out[2], out[3]};
-}
 static inline m4 m4_mul(m4 m1, m4 m2)
 {
     m4 out;
