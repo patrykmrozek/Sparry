@@ -10,9 +10,7 @@ result_t render_state_init(render_state_t **out_render_state)
 
     render_state_t *render_state = malloc(sizeof(render_state_t));
     if (!render_state) {
-        LOG(LOG_LEVEL_ERROR,
-            __FILE__, __FUNCTION__, __LINE__,
-            "render state allocation failed");
+        ERROR("render state allocation failed");
         return RESULT_ERROR_ALLOC;
     }
 
@@ -23,26 +21,22 @@ result_t render_state_init(render_state_t **out_render_state)
                                             SCREEN_HEIGHT,
                                             SDL_WINDOW_SHOWN);
     if (!render_state->window) {
-        LOG(LOG_LEVEL_ERROR,
-            __FILE__, __FUNCTION__, __LINE__,
-            "render state window creation failed");
+        ERROR("render state window creation failed");
         res = RESULT_ERROR_ALLOC;
         goto err;
     }
-    LOG(LOG_LEVEL_INFO, "window: %p", render_state->window);
+    INFO("window: %p", render_state->window);
     SDL_RaiseWindow(render_state->window);
     
     render_state->renderer = SDL_CreateRenderer(render_state->window,
                                                 -1,
                                                 SDL_RENDERER_ACCELERATED);
     if (!render_state->renderer) {
-        LOG(LOG_LEVEL_ERROR,
-            __FILE__, __FUNCTION__, __LINE__,
-            "render state renderer creation failed");
+        ERROR("render state renderer creation failed");
         res = RESULT_ERROR_ALLOC;
         goto err;
     }
-    LOG(LOG_LEVEL_INFO, "renderer: %p", render_state->renderer);
+    INFO("renderer: %p", render_state->renderer);
 
     render_state->texture = SDL_CreateTexture(render_state->renderer,
                                               SDL_PIXELFORMAT_BGRA32,
@@ -50,19 +44,15 @@ result_t render_state_init(render_state_t **out_render_state)
                                               SCREEN_WIDTH,
                                               SCREEN_HEIGHT);
     if (!render_state->texture) {
-        LOG(LOG_LEVEL_ERROR,
-            __FILE__, __FUNCTION__, __LINE__,
-            "render state texture creation failed");
+        ERROR("render state texture creation failed");
         res = RESULT_ERROR_ALLOC;
         goto err;
     }
-    LOG(LOG_LEVEL_INFO, "texture: %p", render_state->texture);
+    INFO("texture: %p", render_state->texture);
 
     res = raster_context_init(&render_state->raster_ctx);
     if (res != RESULT_OK) {
-        LOG(LOG_LEVEL_ERROR,
-            __FILE__, __FUNCTION__, __LINE__,
-            "render state raster ctx creation failed"); 
+        ERROR("render state raster ctx creation failed"); 
         goto err;
     }
 

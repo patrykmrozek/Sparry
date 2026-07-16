@@ -63,14 +63,14 @@ bool world_to_screen(v3 world, v3 *ret)
 {
     v3 view, ndc, screen;
 
-    LOG(LOG_LEVEL_DEBUG, "ORIGINAL: " V3F_STR(world));
+    DEBUG("ORIGINAL: " V3F_STR(world));
     view = to_view_space(world);
-    LOG(LOG_LEVEL_DEBUG, "VIEW: " V3F_STR(view));
+    DEBUG("VIEW: " V3F_STR(view));
     if (view.z < NEAR || view.z > FAR) return false; //clip
     ndc = to_ndc(view);
-    LOG(LOG_LEVEL_DEBUG, "NDC: " V3F_STR(ndc));
+    DEBUG("NDC: " V3F_STR(ndc));
     screen = to_screen(ndc);
-    LOG(LOG_LEVEL_DEBUG, "SCREEN: " V3F_STR(screen));
+    DEBUG("SCREEN: " V3F_STR(screen));
 
     *ret = screen;
     return true;

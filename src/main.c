@@ -17,9 +17,7 @@ int main()
     render_state_t *render_state;
     result_t res = render_state_init(&render_state);
     if (res != RESULT_OK) {
-        LOG(LOG_LEVEL_ERROR,
-            __FILE__, __FUNCTION__, __LINE__,
-            "main render state creation failed");
+        ERROR("main render state creation failed");
         return 1;
     }
     

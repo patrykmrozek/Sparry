@@ -5,6 +5,7 @@ $(OUT):
 		-DLOG_MODE_INFO \
 		-DLOG_MODE_ERROR \
 		-DLOG_MODE_TRACE \
+		-DLOG_MODE_DEBUG \
 		src/main.c \
 		src/raster.c \
 		src/render.c \

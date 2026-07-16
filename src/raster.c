@@ -16,9 +16,7 @@ result_t raster_context_init(raster_context_t **out_raster_ctx)
     raster_context_t *raster_ctx = 
         (raster_context_t*)malloc(sizeof(*raster_ctx));
     if (!raster_ctx) {
-        LOG(LOG_LEVEL_ERROR,
-            __FILE__, __FUNCTION__, __LINE__,
-            "raster context init allocation failed");
+        ERROR("raster context init allocation failed");
         return RESULT_ERROR_ALLOC;
     }
     raster_context_clear(raster_ctx);
@@ -36,9 +34,7 @@ void raster_put_pixel(raster_context_t *raster_ctx,
                       i32 x, i32 y, f32 z, u32 c)
 {
     if (!IN_BOUNDS(x, y)) {
-        LOG(LOG_LEVEL_DEBUG,
-            "pixel out of bounds: {%d, %d}",
-            x, y);
+        DEBUG("pixel out of bounds: {%d, %d}", x, y);
         return;
     }
     u32 idx = (y * SCREEN_WIDTH) + x;
@@ -96,9 +92,8 @@ void raster_put_line(raster_context_t *raster_ctx,
     v3 p0s, p1s;
     if (!world_to_screen(p0, &p0s)) return;
     if (!world_to_screen(p1, &p1s)) return;
-    LOG(LOG_LEVEL_DEBUG,
-        "p0s = %f %f | p1f = %f %f", 
-        p0s.x, p0s.y, p1s.x, p1s.y);
+    DEBUG("p0s = %f %f | p1f = %f %f",
+          p0s.x, p0s.y, p1s.x, p1s.y);
 
     i32 x0 = (i32)p0s.x;
     i32 y0 = (i32)p0s.y;
@@ -125,9 +120,7 @@ void raster_put_line(raster_context_t *raster_ctx,
     i32 y = y0;
 
     for (i32 x = x0; x < x1; x++) {
-        LOG(LOG_LEVEL_DEBUG,
-             "DIFF: %d",
-             diff);
+        DEBUG("DIFF: %d", diff);
 
         if (is_steep) raster_put_pixel(raster_ctx, y, x, 0, c);
         else          raster_put_pixel(raster_ctx, x, y, 0, c);
