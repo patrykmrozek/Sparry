@@ -134,6 +134,20 @@ void raster_put_line(raster_context_t *raster_ctx,
     }
 }
 
+//a barycentric coord $ in triangle A, B, C could be described 
+//as the ratio of areas $BC, $CA, $AB
+//if any are negative, $ is outside of the triangle
+v3 barycentric(v3 a, v3 b, v3 c, v3 p)
+{
+    //tri areas
+    i32 tri_area = v2_cross(v2_sub(b, a), v2_sub(c, a));
+    f32 pbc = v2_cross(v2_sub(b, p), v2_sub(c, p))/tri_area;
+    f32 pca = v2_cross(v2_sub(c, p), v2_sub(a, p))/tri_area;
+    f32 pab = 1 - pbc - pca;
+
+    return (v3){pbc, pca, pab};
+}
+
 void raster_put_triangle(raster_context_t *raster_ctx,
                                    v3 p1, v3 p2, v3 p3, u32 c)
 {
