@@ -19,4 +19,7 @@ void raster_put_pixel_vec(raster_context_t *raster_ctx, v3 v, u32 c);
 
 void raster_put_line(raster_context_t *raster_ctx, v3 p1, v3 p2, u32 color);
 
+void raster_put_triangle(raster_context_t *raster_ctx,
+                         v3 p1, v3 p2, v3 p3, u32 color);
+
 #endif //_RASTER_H

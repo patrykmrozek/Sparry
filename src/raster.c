@@ -134,3 +134,15 @@ void raster_put_line(raster_context_t *raster_ctx,
     }
 }
 
+void raster_put_triangle(raster_context_t *raster_ctx,
+                                   v3 p1, v3 p2, v3 p3, u32 c)
+{
+    if (p1.y > p2.y) SWAP(p1, p2);
+    if (p1.y > p3.y) SWAP(p1, p3);
+    if (p2.y > p3.y) SWAP(p2, p3);
+
+    raster_put_line(raster_ctx, p1, p2, c);
+    raster_put_line(raster_ctx, p2, p3, c);
+    raster_put_line(raster_ctx, p3, p1, c);
+}
+

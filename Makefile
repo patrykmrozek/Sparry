@@ -1,11 +1,8 @@
 OUT = sparry
-#add -DLOG_MODE_ALL to enable logging
+
 $(OUT):
 	gcc \
-		-DLOG_MODE_INFO \
-		-DLOG_MODE_ERROR \
-		-DLOG_MODE_TRACE \
-		-DLOG_MODE_DEBUG \
+		-DLOG_MODE_ALL \
 		src/main.c \
 		src/raster.c \
 		src/render.c \

@@ -72,6 +72,7 @@ bool world_to_screen(v3 world, v3 *ret)
     screen = to_screen(ndc);
     DEBUG("SCREEN: " V3F_STR(screen));
 
+    //2d x,y - z=depth
     *ret = screen;
     return true;
 }
