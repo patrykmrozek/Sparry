@@ -134,23 +134,6 @@ void raster_put_line(raster_context_t *raster_ctx,
     }
 }
 
-//need to add ts to celp
-#define TRI_AREA(a, b, c) v2_cross(v2_sub(b, a), v2_sub(c, a))
-
-//a barycentric coord $ in triangle A, B, C could be described 
-//as the ratio of areas $BC, $CA, $AB
-//if any are negative, $ is outside of the triangle
-v3 barycentric(v3 a, v3 b, v3 c, v3 p)
-{
-    //tri areas
-    i32 tri_area = TRI_AREA(a, b, c);
-    f32 pbc = TRI_AREA(p, b, c)/tri_area;
-    f32 pca = TRI_AREA(p, c, a)/tri_area;
-    f32 pab = 1 - pbc - pca;
-
-    return (v3){pbc, pca, pab};
-}
-
 void raster_put_triangle(raster_context_t *raster_ctx,
                                    v3 p1, v3 p2, v3 p3, u32 c)
 {
@@ -158,8 +141,17 @@ void raster_put_triangle(raster_context_t *raster_ctx,
     if (p1.y > p3.y) SWAP(p1, p3);
     if (p2.y > p3.y) SWAP(p2, p3);
 
+    // temporary wireframe
     raster_put_line(raster_ctx, p1, p2, c);
     raster_put_line(raster_ctx, p2, p3, c);
     raster_put_line(raster_ctx, p3, p1, c);
+
+    /*
+     * calculate bounding box of triangle
+     * for each pixel in bounding box check if all values 
+     *  of barycentric coord are positive
+     * if so: pixel in triangle, put pixel
+     * if not: pixel outside triangle - skip
+     */
 }
 

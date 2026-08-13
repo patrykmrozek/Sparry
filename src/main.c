@@ -13,7 +13,7 @@
 
 int main() 
 {
-    printf("SPARRY\n");
+    INFO("SPARRY\n");
 
     render_state_t *render_state;
     result_t res = render_state_init(&render_state);
