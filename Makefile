@@ -2,7 +2,6 @@ OUT = sparry
 
 $(OUT):
 	gcc \
-		-DLOG_MODE_ALL \
 		src/main.c \
 		src/raster.c \
 		src/render.c \

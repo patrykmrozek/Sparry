@@ -27,4 +27,6 @@
      (_y) >= 0 && \
      (_y) < SCREEN_HEIGHT)
 
+#define RGBA_TO_HEX(r, g, b, a) (a<<24)|(g<<16)|(r<<8)|b
+
 #endif //_COMMON_H

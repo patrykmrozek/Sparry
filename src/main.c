@@ -34,9 +34,10 @@ int main()
 
     SDL_Event event;
     bool game_running = 1;
-    const uint8_t* keystate = SDL_GetKeyboardState(NULL);
+    const u8* keystate = SDL_GetKeyboardState(NULL);
 
-    u32 c = 0xFFFFFFFF;
+    u32 c = RGBA_TO_HEX(255, 255, 255, 1);
+    printf("c: %x\n", c);
 
     while (game_running == 1) {
         while (SDL_PollEvent(&event)) {

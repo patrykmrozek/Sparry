@@ -184,8 +184,11 @@ void raster_put_triangle(raster_context_t *raster_ctx,
         for (i.y = tri_aabb.min.y; i.y < tri_aabb.max.y; i.y++) {
             v3 bary = barycentric(p1s, p2s, p3s, i);
             TRACE("BARY: %f %f %f", bary.x, bary.y, bary.z);
+            u32 inter_c = RGBA_TO_HEX((u8)(255*bary.x), 
+                                      (u8)(255*bary.y),
+                                      (u8)(255*bary.z), 1);
             if (!CONTAINS_NEG(bary)) {
-                raster_put_pixel(raster_ctx, i.x, i.y, 0, c);
+                raster_put_pixel(raster_ctx, i.x, i.y, 0, inter_c);
             }
         }
     }
