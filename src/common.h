@@ -21,6 +21,9 @@
 #define DEG_TO_RAD(_d) ((_d) * (PI / 180)) 
 #define RAD_TO_DEG(_d) ((_d) * (180 / PI))
 
+#define MIN(a, b) (a < b) ? a : b
+#define MAX(a, b) (a > b) ? a : b
+
 #define IN_BOUNDS(_x, _y) \
     ((_x) >= 0 && \
      (_x) < SCREEN_WIDTH && \

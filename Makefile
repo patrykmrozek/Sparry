@@ -3,6 +3,7 @@ OUT = sparry
 $(OUT):
 	gcc \
 		src/main.c \
+		src/aabb.c \
 		src/raster.c \
 		src/render.c \
 		src/camera.c \
