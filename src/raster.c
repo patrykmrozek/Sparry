@@ -134,24 +134,60 @@ void raster_put_line(raster_context_t *raster_ctx,
     }
 }
 
+#define MIN(a, b) (a < b) ? a : b
+#define MAX(a, b) (a > b) ? a : b
+
+typedef struct aabb_s {
+    v3 min, max;
+} aabb_t;
+
+aabb_t get_aabb(v3 p1, v3 p2, v3 p3)
+{
+    aabb_t out;
+    out.min = (v3){
+        MIN(MIN(p1.x, p2.x), p3.x),
+        MIN(MIN(p1.y, p2.y), p3.y),
+        MIN(MIN(p1.z, p2.z), p3.z),
+    };
+    out.max = (v3){
+        MAX(MAX(p1.x, p2.x), p3.x),
+        MAX(MAX(p1.y, p2.y), p3.y),
+        MAX(MAX(p1.z, p2.z), p3.z),
+    };
+
+    return out;
+}
+
+#define CONTAINS_NEG(v) (v.x < 0 || v.y < 0 || v.z < 0)
+
 void raster_put_triangle(raster_context_t *raster_ctx,
-                                   v3 p1, v3 p2, v3 p3, u32 c)
+                         v3 p1, v3 p2, v3 p3, u32 c)
 {
     if (p1.y > p2.y) SWAP(p1, p2);
     if (p1.y > p3.y) SWAP(p1, p3);
     if (p2.y > p3.y) SWAP(p2, p3);
 
-    // temporary wireframe
-    raster_put_line(raster_ctx, p1, p2, c);
-    raster_put_line(raster_ctx, p2, p3, c);
-    raster_put_line(raster_ctx, p3, p1, c);
+    v3 p1s, p2s, p3s;
+    if (!world_to_screen(p1, &p1s) || 
+        !world_to_screen(p2, &p2s) ||
+        !world_to_screen(p3, &p3s)) {
+        TRACE("returning early");
+        return;
+    } 
 
-    /*
-     * calculate bounding box of triangle
-     * for each pixel in bounding box check if all values 
-     *  of barycentric coord are positive
-     * if so: pixel in triangle, put pixel
-     * if not: pixel outside triangle - skip
-     */
+    aabb_t tri_aabb = get_aabb(p1s, p2s, p3s);
+    TRACE("AABB: min %f %f -- max %f %f",
+          tri_aabb.min.x, tri_aabb.min.y,
+          tri_aabb.max.x, tri_aabb.max.y);
+    v3 i;
+    for (i.x = tri_aabb.min.x; i.x < tri_aabb.max.x; i.x++) {
+        for (i.y = tri_aabb.min.y; i.y < tri_aabb.max.y; i.y++) {
+            v3 bary = barycentric(p1s, p2s, p3s, i);
+            TRACE("BARY: %f %f %f", bary.x, bary.y, bary.z);
+            if (!CONTAINS_NEG(bary)) {
+                raster_put_pixel(raster_ctx, i.x, i.y, 0, c);
+            }
+        }
+    }
 }
 

@@ -49,21 +49,21 @@ int main()
         render_frame_begin(render_state);
         {
             raster_put_triangle(render_state->raster_ctx,
-                                          b1, b2, b3, c);
+                                b1, b2, b3, c);
             raster_put_triangle(render_state->raster_ctx,
-                                          b1, b4, b3, c);
+                                b1, b4, b3, c);
             raster_put_triangle(render_state->raster_ctx,
-                                          t1, t2, t3, c);
+                                t1, t2, t3, c);
             raster_put_triangle(render_state->raster_ctx,
-                                          t1, t4, t3, c);
+                                t1, t4, t3, c);
             raster_put_triangle(render_state->raster_ctx,
-                                          b1, t1, b2, c);
+                                b1, t1, b2, c);
             raster_put_triangle(render_state->raster_ctx,
-                                          b2, t2, b3, c);
+                                b2, t2, b3, c);
             raster_put_triangle(render_state->raster_ctx,
-                                          b3, t3, b4, c);
+                                b3, t3, b4, c);
             raster_put_triangle(render_state->raster_ctx,
-                                          b4, t4, b1, c);
+                                b4, t4, b1, c);
         }
         render_frame_end(render_state); 
     }
