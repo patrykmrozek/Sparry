@@ -5,7 +5,6 @@
 #define CELP_STRIP_PREFIX
 #include "../../celp/celp.h"
 #undef log
-#define LOG celp_log
 
 #include <stdint.h>
 

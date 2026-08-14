@@ -8,9 +8,9 @@
 
 extern camera_t g_camera;
 
-v3 to_view_space(v3 v);
-v3 to_ndc(v3 v);
-v3 to_screen(v3 v);
-bool world_to_screen(v3 v, v3 *ret);
+v3 trans_to_view(v3 v);
+v3 trans_to_ndc(v3 v);
+v3 trans_to_screen(v3 v);
+bool trans_world_to_screen(v3 v, v3 *ret);
 
 #endif //_TRANSFORM_H

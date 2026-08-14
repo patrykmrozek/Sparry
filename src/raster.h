@@ -5,21 +5,21 @@
 #include "la.h"
 #include "result.h"
 
-typedef struct raster_context_s {
-    u32 framebuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
+typedef struct rt_ctx_s {
+    u32 fbuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
     f32 zbuffer[SCREEN_WIDTH*SCREEN_HEIGHT];
-} raster_context_t;
+} rt_ctx_t;
 
-void raster_context_clear(raster_context_t *raster_ctx);
-result_t raster_context_init(raster_context_t **out_raster_ctx);
-void raster_context_destroy(raster_context_t *raster_ctx);
+void rt_ctx_clear(rt_ctx_t *rt_ctx);
+result_t rt_ctx_init(rt_ctx_t **out_rt_ctx);
+void rt_ctx_destroy(rt_ctx_t *rt_ctx);
 
-void raster_put_pixel(raster_context_t *raster_ctx, i32 x, i32 y, f32 z, u32 c);
-void raster_put_pixel_vec(raster_context_t *raster_ctx, v3 v, u32 c);
+void rt_put_pixel(rt_ctx_t *rt_ctx, i32 x, i32 y, f32 z, u32 c);
+void rt_put_pixel_vec(rt_ctx_t *rt_ctx, v3 v, u32 c);
 
-void raster_put_line(raster_context_t *raster_ctx, v3 p1, v3 p2, u32 color);
+void rt_put_line(rt_ctx_t *rt_ctx, v3 p1, v3 p2, u32 c);
 
-void raster_put_triangle(raster_context_t *raster_ctx,
-                         v3 p1, v3 p2, v3 p3, u32 color);
+void rt_put_tri(rt_ctx_t *rt_ctx,
+                v3 p1, v3 p2, v3 p3, u32 c);
 
 #endif //_RASTER_H
