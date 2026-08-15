@@ -31,4 +31,21 @@
 
 #define RGBA_TO_HEX(r, g, b, a) (a<<24)|(g<<16)|(r<<8)|b
 
+#define HANDLE_ERROR_RET(cond, err, msg) \
+({ \
+    if (!(cond)) { \
+        if ((msg)) ERROR((msg)); else ERROR(""); \
+        return err; \
+    } \
+ })
+
+#define HANDLE_ERROR_TAG(cond, err, msg, res, tag) \
+({ \
+    if (!(cond)) { \
+        if ((msg)) ERROR((msg)); else ERROR(""); \
+        (res) = (err); \
+        goto tag; \
+    } \
+ })
+
 #endif //_COMMON_H

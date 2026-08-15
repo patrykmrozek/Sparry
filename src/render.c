@@ -6,61 +6,45 @@ result_t rd_state_init(rd_state_t **state_pp)
 {
     result_t res;
 
+    rd_state_t *state = malloc(sizeof(rd_state_t));
+    HANDLE_ERROR_RET(state, RESULT_ERROR_ALLOC, "rd state alloc");
+
     SDL_Init(SDL_INIT_VIDEO);
-
-    rd_state_t *rd_state = malloc(sizeof(rd_state_t));
-    if (!rd_state) {
-        ERROR("rd state allocation failed");
-        return RESULT_ERROR_ALLOC;
-    }
-
-    rd_state->window = SDL_CreateWindow("SPARRY",
-                                        SDL_WINDOWPOS_CENTERED,
-                                        SDL_WINDOWPOS_CENTERED,
-                                        SCREEN_WIDTH,
-                                        SCREEN_HEIGHT,
-                                        SDL_WINDOW_SHOWN);
-    if (!rd_state->window) {
-        ERROR("rd state window creation failed");
-        res = RESULT_ERROR_ALLOC;
-        goto err;
-    }
-    INFO("window: %p", rd_state->window);
-    SDL_RaiseWindow(rd_state->window);
+    state->window = SDL_CreateWindow("SPARRY",
+                                     SDL_WINDOWPOS_CENTERED,
+                                     SDL_WINDOWPOS_CENTERED,
+                                     SCREEN_WIDTH,
+                                     SCREEN_HEIGHT,
+                                     SDL_WINDOW_SHOWN);
+    HANDLE_ERROR_TAG(state->window, RESULT_ERROR_ALLOC,
+                     "rd window create", res, err);
+    INFO("window: %p", state->window);
+    SDL_RaiseWindow(state->window);
     
-    rd_state->renderer = SDL_CreateRenderer(rd_state->window,
-                                            -1,
-                                            SDL_RENDERER_ACCELERATED);
-if (!rd_state->renderer) {
-        ERROR("rd state renderer creation failed");
-        res = RESULT_ERROR_ALLOC;
-        goto err;
-    }
-    INFO("renderer: %p", rd_state->renderer);
+    state->renderer = SDL_CreateRenderer(state->window, -1,
+                                         SDL_RENDERER_ACCELERATED);
+    HANDLE_ERROR_TAG(state->renderer, RESULT_ERROR_ALLOC,
+                     "rd state renderer", res, err);
+    INFO("renderer: %p", state->renderer);
 
-    rd_state->texture = SDL_CreateTexture(rd_state->renderer,
-                                          SDL_PIXELFORMAT_BGRA32,
-                                          SDL_TEXTUREACCESS_STREAMING,
-                                          SCREEN_WIDTH,
-                                          SCREEN_HEIGHT);
-    if (!rd_state->texture) {
-        ERROR("rd state texture creation failed");
-        res = RESULT_ERROR_ALLOC;
-        goto err;
-    }
-    INFO("texture: %p", rd_state->texture);
+    state->texture = SDL_CreateTexture(state->renderer,
+                                       SDL_PIXELFORMAT_BGRA32,
+                                       SDL_TEXTUREACCESS_STREAMING,
+                                       SCREEN_WIDTH,
+                                       SCREEN_HEIGHT);
+    HANDLE_ERROR_TAG(state->texture, RESULT_ERROR_ALLOC,
+                     "rd state texture", res, err);
+    INFO("texture: %p", state->texture);
 
-    res = rt_ctx_init(&rd_state->rt_ctx);
-    if (res != RESULT_OK) {
-        ERROR("rd state rt ctx creation failed"); 
-        goto err;
-    }
+    res = rt_ctx_init(&state->rt_ctx); 
+    HANDLE_ERROR_TAG(res==RESULT_OK, RESULT_ERROR_ALLOC,
+                     "rt_ctx_init", res, err);
 
-    *state_pp = rd_state;
+    *state_pp = state;
     return RESULT_OK;
 
 err:
-    rd_state_destroy(rd_state);
+    rd_state_destroy(state);
     return res;
 }
 

@@ -2,6 +2,7 @@ OUT = sparry
 
 $(OUT):
 	gcc \
+		-DLOG_MODE_ERROR \
 		src/main.c \
 		src/aabb.c \
 		src/raster.c \

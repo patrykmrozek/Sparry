@@ -17,10 +17,7 @@ int main()
 
     rd_state_t *rd_state;
     result_t res = rd_state_init(&rd_state);
-    if (res != RESULT_OK) {
-        ERROR("main render state creation failed");
-        return 1;
-    }
+    HANDLE_ERROR_RET(res==RESULT_OK, 1, "main render state");
     
     v3 b1 = {-10, -10,  10};
     v3 b2 = { 10, -10,  10};

@@ -46,22 +46,14 @@ static inline v3 v3_lerp(v3 a, v3 b, f32 t)
 #define V3_TO_V2(v) (v2){v.x, v.y}
 
 //a barycentric coord $ in triangle A, B, C could be described 
-//as the ratio of areas $BC, $CA, $AB
-//if any are negative, $ is outside of the triangle
-static inline v3 barycentric(v3 a, v3 b, v3 c, v3 p)
+//as the ratio of areas $BC:$CA:$AB
+static inline v3 barycentric(v2 a, v2 b, v2 c, v2 p)
 {
-    DEBUG("a: "V3F_STR(a));
-    DEBUG("b: "V3F_STR(b));
-    DEBUG("c: "V3F_STR(c));
-    v2 a2 = V3_TO_V2(a);
-    v2 b2 = V3_TO_V2(b);
-    v2 c2 = V3_TO_V2(c);
-    v2 p2 = V3_TO_V2(p);
     //tri areas
-    f32 tri_area = TRI_AREA(a2, b2, c2);
+    f32 tri_area = TRI_AREA(a, b, c);
     DEBUG("tri_area: %f", tri_area);
-    f32 pbc = TRI_AREA(p2, b2, c2)/tri_area;
-    f32 pca = TRI_AREA(p2, c2, a2)/tri_area;
+    f32 pbc = TRI_AREA(p, b, c)/tri_area;
+    f32 pca = TRI_AREA(p, c, a)/tri_area;
     f32 pab = 1 - pbc - pca;
 
     return (v3){pbc, pca, pab};
