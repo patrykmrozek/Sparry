@@ -142,12 +142,12 @@ void rt_put_tri(rt_ctx_t *ctx,
     TRACE("AABB: min %f %f -- max %f %f",
           tri_aabb.min.x, tri_aabb.min.y,
           tri_aabb.max.x, tri_aabb.max.y);
-    v2 i;
+    v2i i;
     for (i.x = tri_aabb.min.x; i.x < tri_aabb.max.x; i.x++) {
         for (i.y = tri_aabb.min.y; i.y < tri_aabb.max.y; i.y++) {
-            v3 bary = barycentric(V3_TO_V2(as), 
-                                  V3_TO_V2(bs),
-                                  V3_TO_V2(cs),
+            v3 bary = barycentric(V3_TO_V2i(as), 
+                                  V3_TO_V2i(bs),
+                                  V3_TO_V2i(cs),
                                   i);
             TRACE("BARY: %f %f %f", bary.x, bary.y, bary.z);
             u32 inter_c = RGBA_TO_HEX((u8)(255*bary.x), 

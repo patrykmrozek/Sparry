@@ -8,6 +8,9 @@
 V2(f32)
 #define v2 V2_T(f32)
 
+V2(i32)
+#define v2i V2_T(i32)
+
 V3(f32)
 #define v3 V3_T(f32)
 
@@ -44,10 +47,11 @@ static inline v3 v3_lerp(v3 a, v3 b, f32 t)
 #define TRI_AREA(a, b, c) (v2_cross(v2_sub(b, a), v2_sub(c, a)))
 
 #define V3_TO_V2(v) (v2){v.x, v.y}
+#define V3_TO_V2i(v) (v2i){(i32)v.x, (i32)v.y}
 
 //a barycentric coord $ in triangle A, B, C could be described 
 //as the ratio of areas $BC:$CA:$AB
-static inline v3 barycentric(v2 a, v2 b, v2 c, v2 p)
+static inline v3 barycentric(v2i a, v2i b, v2i c, v2i p)
 {
     //tri areas
     f32 tri_area = TRI_AREA(a, b, c);
