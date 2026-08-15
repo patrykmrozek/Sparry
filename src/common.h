@@ -33,7 +33,7 @@
 
 #define HANDLE_ERROR_RET(cond, err, msg) \
 ({ \
-    if (!(cond)) { \
+    if ((cond)) { \
         if ((msg)) ERROR((msg)); else ERROR(""); \
         return err; \
     } \
@@ -41,7 +41,7 @@
 
 #define HANDLE_ERROR_TAG(cond, err, msg, res, tag) \
 ({ \
-    if (!(cond)) { \
+    if ((cond)) { \
         if ((msg)) ERROR((msg)); else ERROR(""); \
         (res) = (err); \
         goto tag; \

@@ -17,7 +17,7 @@ int main()
 
     rd_state_t *rd_state;
     result_t res = rd_state_init(&rd_state);
-    HANDLE_ERROR_RET(res==RESULT_OK, 1, NULL);
+    HANDLE_ERROR_RET(res!=RESULT_OK, 1, NULL);
     
     v3 b1 = {-10, -10,  10};
     v3 b2 = { 10, -10,  10};

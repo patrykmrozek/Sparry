@@ -7,7 +7,7 @@ result_t rd_state_init(rd_state_t **state_pp)
     result_t res;
 
     rd_state_t *state = malloc(sizeof(rd_state_t));
-    HANDLE_ERROR_RET(state, RESULT_ERROR_ALLOC, "rd state alloc");
+    HANDLE_ERROR_RET(!state, RESULT_ERROR_ALLOC, "rd state alloc");
 
     SDL_Init(SDL_INIT_VIDEO);
     state->window = SDL_CreateWindow("SPARRY",
@@ -16,14 +16,14 @@ result_t rd_state_init(rd_state_t **state_pp)
                                      SCREEN_WIDTH,
                                      SCREEN_HEIGHT,
                                      SDL_WINDOW_SHOWN);
-    HANDLE_ERROR_TAG(state->window, RESULT_ERROR_ALLOC,
+    HANDLE_ERROR_TAG(!state->window, RESULT_ERROR_ALLOC,
                      "rd window create", res, err);
     INFO("window: %p", state->window);
     SDL_RaiseWindow(state->window);
     
     state->renderer = SDL_CreateRenderer(state->window, -1,
                                          SDL_RENDERER_ACCELERATED);
-    HANDLE_ERROR_TAG(state->renderer, RESULT_ERROR_ALLOC,
+    HANDLE_ERROR_TAG(!state->renderer, RESULT_ERROR_ALLOC,
                      "rd state renderer", res, err);
     INFO("renderer: %p", state->renderer);
 
@@ -32,12 +32,12 @@ result_t rd_state_init(rd_state_t **state_pp)
                                        SDL_TEXTUREACCESS_STREAMING,
                                        SCREEN_WIDTH,
                                        SCREEN_HEIGHT);
-    HANDLE_ERROR_TAG(state->texture, RESULT_ERROR_ALLOC,
+    HANDLE_ERROR_TAG(!state->texture, RESULT_ERROR_ALLOC,
                      "rd state texture", res, err);
     INFO("texture: %p", state->texture);
 
     res = rt_ctx_init(&state->rt_ctx); 
-    HANDLE_ERROR_TAG(res==RESULT_OK, RESULT_ERROR_ALLOC,
+    HANDLE_ERROR_TAG(res!=RESULT_OK, RESULT_ERROR_ALLOC,
                      "rt_ctx_init", res, err);
 
     *state_pp = state;

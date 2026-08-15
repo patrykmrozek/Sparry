@@ -14,7 +14,7 @@ void rt_ctx_clear(rt_ctx_t *ctx)
 result_t rt_ctx_init(rt_ctx_t **ctx_pp)
 {
     rt_ctx_t *ctx = (rt_ctx_t*)malloc(sizeof(*ctx));
-    HANDLE_ERROR_RET(ctx, RESULT_ERROR_ALLOC,
+    HANDLE_ERROR_RET(!ctx, RESULT_ERROR_ALLOC,
                      "rt ctx init alloc");
     rt_ctx_clear(ctx);
     *ctx_pp = ctx;
