@@ -63,14 +63,14 @@ bool trans_world_to_screen(v3 world, v3 *out)
 {
     v3 view, ndc, screen;
 
-    DEBUG("ORIGINAL: " V3F_STR(world));
+    DEBUG(3, "ORIGINAL: " V3F_STR(world));
     view = trans_to_view(world);
-    //DEBUG("VIEW: " V3F_STR(view));
+    DEBUG(3, "VIEW: " V3F_STR(view));
     if (view.z < NEAR || view.z > FAR) return false; //clip
     ndc = trans_to_ndc(view);
-    //DEBUG("NDC: " V3F_STR(ndc));
+    DEBUG(3, "NDC: " V3F_STR(ndc));
     screen = trans_to_screen(ndc);
-    DEBUG("SCREEN: " V3F_STR(screen));
+    DEBUG(3, "SCREEN: " V3F_STR(screen));
 
     //2d x,y - z=depth
     *out = screen;

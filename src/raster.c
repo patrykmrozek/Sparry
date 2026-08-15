@@ -30,7 +30,7 @@ void rt_ctx_destroy(rt_ctx_t *ctx)
 void rt_put_pixel(rt_ctx_t *ctx, i32 x, i32 y, f32 z, u32 col)
 {
     if (!IN_BOUNDS(x, y)) {
-        DEBUG("pixel out of bounds: {%d, %d}", x, y);
+        DEBUG(3, "pixel out of bounds: {%d, %d}", x, y);
         return;
     }
     u32 idx = (y * SCREEN_WIDTH) + x;
@@ -77,7 +77,7 @@ void rt_put_line(rt_ctx_t *ctx, v3 p0, v3 p1, u32 col)
     v3 p0s, p1s;
     if (!trans_world_to_screen(p0, &p0s)) return;
     if (!trans_world_to_screen(p1, &p1s)) return;
-    DEBUG("p0s = %f %f | p1f = %f %f",
+    DEBUG(3, "p0s = %f %f | p1f = %f %f",
           p0s.x, p0s.y, p1s.x, p1s.y);
 
     i32 x0 = (i32)p0s.x;
@@ -105,7 +105,7 @@ void rt_put_line(rt_ctx_t *ctx, v3 p0, v3 p1, u32 col)
     i32 y = y0;
 
     for (i32 x = x0; x < x1; x++) {
-        DEBUG("DIFF: %d", diff);
+        DEBUG(3, "DIFF: %d", diff);
 
         if (is_steep) rt_put_pixel(ctx, y, x, 0, col);
         else          rt_put_pixel(ctx, x, y, 0, col);
@@ -134,12 +134,12 @@ void rt_put_tri(rt_ctx_t *ctx,
     if (!trans_world_to_screen(a, &as) || 
         !trans_world_to_screen(b, &bs) ||
         !trans_world_to_screen(c, &cs)) {
-        TRACE("returning early");
+        DEBUG(3, "returning early");
         return;
     } 
 
     aabb_t tri_aabb = aabb_get(as, bs, cs);
-    TRACE("AABB: min %f %f -- max %f %f",
+    DEBUG(2, "AABB: min %f %f -- max %f %f",
           tri_aabb.min.x, tri_aabb.min.y,
           tri_aabb.max.x, tri_aabb.max.y);
     v2i i;
@@ -149,7 +149,8 @@ void rt_put_tri(rt_ctx_t *ctx,
                                   V3_TO_V2i(bs),
                                   V3_TO_V2i(cs),
                                   i);
-            TRACE("BARY: %f %f %f", bary.x, bary.y, bary.z);
+            DEBUG(0, "BARY (%d, %d): %f %f %f",
+                  i.x, i.y, bary.x, bary.y, bary.z);
             u32 inter_c = RGBA_TO_HEX((u8)(255*bary.x), 
                                       (u8)(255*bary.y),
                                       (u8)(255*bary.z), 1);

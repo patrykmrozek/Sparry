@@ -55,7 +55,8 @@ static inline v3 barycentric(v2i a, v2i b, v2i c, v2i p)
 {
     //tri areas
     f32 tri_area = TRI_AREA(a, b, c);
-    DEBUG("tri_area: %f", tri_area);
+    DEBUG(0, "tri_area: (%f %f) | (%f %f) | (%f %f) = %f",
+          a.x, a.y, b.x, b.y, c.x, c.y, tri_area);
     f32 pbc = TRI_AREA(p, b, c)/tri_area;
     f32 pca = TRI_AREA(p, c, a)/tri_area;
     f32 pab = 1 - pbc - pca;

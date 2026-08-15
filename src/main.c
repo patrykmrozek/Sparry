@@ -17,7 +17,7 @@ int main()
 
     rd_state_t *rd_state;
     result_t res = rd_state_init(&rd_state);
-    HANDLE_ERROR_RET(res==RESULT_OK, 1, "main render state");
+    HANDLE_ERROR_RET(res==RESULT_OK, 1, NULL);
     
     v3 b1 = {-10, -10,  10};
     v3 b2 = { 10, -10,  10};
@@ -45,7 +45,7 @@ int main()
         input_process(keystate);
         rd_frame_begin(rd_state);
         {
-            rt_put_tri(rd_state->rt_ctx, t1, b1, b2, c);
+            //rt_put_tri(rd_state->rt_ctx, t1, b1, b2, c);
             rt_put_tri(rd_state->rt_ctx, t2, t1, b2, c);
         }
         rd_frame_end(rd_state); 
