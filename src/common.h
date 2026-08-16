@@ -29,8 +29,6 @@
      (_y) >= 0 && \
      (_y) < SCREEN_HEIGHT)
 
-#define RGBA_TO_HEX(r, g, b, a) (a<<24)|(g<<16)|(r<<8)|b
-
 #define HANDLE_ERROR_RET(cond, err, msg) \
 ({ \
     if ((cond)) { \

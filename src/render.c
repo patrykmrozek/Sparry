@@ -35,6 +35,7 @@ result_t rd_state_init(rd_state_t **state_pp)
     HANDLE_ERROR_TAG(!state->texture, RESULT_ERROR_ALLOC,
                      "rd state texture", res, err);
     INFO("texture: %p", state->texture);
+    SDL_SetTextureBlendMode(state->texture, SDL_BLENDMODE_BLEND);
 
     res = rt_ctx_init(&state->rt_ctx); 
     HANDLE_ERROR_TAG(res!=RESULT_OK, RESULT_ERROR_ALLOC,

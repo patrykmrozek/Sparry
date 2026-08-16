@@ -27,7 +27,7 @@ void rt_ctx_destroy(rt_ctx_t *ctx)
     free(ctx);
 }
 
-void rt_put_pixel(rt_ctx_t *ctx, i32 x, i32 y, f32 z, u32 col)
+void rt_put_pixel(rt_ctx_t *ctx, i32 x, i32 y, f32 z, colour_t col)
 {
     if (!IN_BOUNDS(x, y)) {
         DEBUG(3, "pixel out of bounds: {%d, %d}", x, y);
@@ -36,11 +36,11 @@ void rt_put_pixel(rt_ctx_t *ctx, i32 x, i32 y, f32 z, u32 col)
     u32 idx = (y * SCREEN_WIDTH) + x;
     if (ctx->zbuffer[idx]> z) {
         ctx->zbuffer[idx] = z;
-        ctx->fbuffer[idx] = col;
+        ctx->fbuffer[idx] = COL_TO_HEX(col);
     }
 }
 
-void rt_put_pixel_vec(rt_ctx_t *ctx, v3 v, u32 col)
+void rt_put_pixel_vec(rt_ctx_t *ctx, v3 v, colour_t col)
 {
     i32 x = (i32)v.x;
     i32 y = (i32)v.y;
@@ -72,7 +72,7 @@ void rt_put_pixel_vec(rt_ctx_t *ctx, v3 v, u32 col)
  * when we're putting pixels, we then must check if is_steep, in  which case we
  * must put the pixels in reverse order essentially undo the swap above.
  */
-void rt_put_line(rt_ctx_t *ctx, v3 p0, v3 p1, u32 col)
+void rt_put_line(rt_ctx_t *ctx, v3 p0, v3 p1, colour_t col)
 {
     v3 p0s, p1s;
     if (!trans_world_to_screen(p0, &p0s)) return;
@@ -127,9 +127,8 @@ void rt_put_line(rt_ctx_t *ctx, v3 p0, v3 p1, u32 col)
  * then P is inside the triangle, and therefore we can put a pixel at P.
  */
 void rt_put_tri(rt_ctx_t *ctx,
-                v3 a, v3 b, v3 c, u32 col)
+                v3 a, v3 b, v3 c, colour_t col)
 {
-    (void)col; //temporary
     v3 as, bs, cs;
     if (!trans_world_to_screen(a, &as) || 
         !trans_world_to_screen(b, &bs) ||
@@ -151,11 +150,10 @@ void rt_put_tri(rt_ctx_t *ctx,
                                   i);
             DEBUG(0, "BARY (%d, %d): %f %f %f",
                   i.x, i.y, bary.x, bary.y, bary.z);
-            u32 inter_c = RGBA_TO_HEX((u8)(255*bary.x), 
-                                      (u8)(255*bary.y),
-                                      (u8)(255*bary.z), 1);
+
             if (!v3_contains_neg(bary)) {
-                rt_put_pixel(ctx, i.x, i.y, 0, inter_c);
+                rt_put_pixel(ctx, i.x, i.y, 0,
+                             BARY_COL(bary, col));
             }
         }
     }

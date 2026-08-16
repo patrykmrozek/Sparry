@@ -62,6 +62,6 @@ static inline v3 barycentric(v2i a, v2i b, v2i c, v2i p)
     f32 pab = 1 - pbc - pca;
 
     return (v3){pbc, pca, pab};
-}
+} 
 
 #endif //_LA_H

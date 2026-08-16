@@ -33,7 +33,7 @@ int main()
     bool game_running = 1;
     const u8* keystate = SDL_GetKeyboardState(NULL);
 
-    u32 c = RGBA_TO_HEX(255, 255, 255, 1);
+    colour_t c = (colour_t){255, 255, 255, 10};
 
     while (game_running) {
         while (SDL_PollEvent(&event)) {
