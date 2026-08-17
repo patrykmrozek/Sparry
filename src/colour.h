@@ -1,7 +1,7 @@
 #ifndef _COLOUR_H
 #define _COLOUR_H
 
-#include "common.h"
+#include "la.h"
 
 typedef struct colour_s {
     u8 r, g, b, a;
@@ -12,16 +12,22 @@ typedef struct colour_s {
                         (u32)((col).g<<8)| \
                         (u32)(col).b
 
-#define BARY_COL(bary, col)   \
-({ \
-    colour_t _c; \
-    _c.r = (col).r*(bary).x; \
-    _c.g = (col).g*(bary).y; \
-    _c.b = (col).b*(bary).z; \
-    _c.a = (col).a; \
-    \
-    _c; \
-})
+static inline colour_t
+colerp(colour_t col, f32 x, f32 y, f32 z)
+{
+    return (colour_t){
+        col.r * x,
+        col.g * y,
+        col.b * z,
+        col.a
+    };
+}
+
+static inline colour_t
+colerpv(colour_t col, v3 v)
+{
+    return colerp(col, v.x, v.y, v.z);
+}
 
 
 #endif //_COLOUR_H

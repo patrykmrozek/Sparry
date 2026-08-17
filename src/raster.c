@@ -153,7 +153,7 @@ void rt_put_tri(rt_ctx_t *ctx,
 
             if (!v3_contains_neg(bary)) {
                 rt_put_pixel(ctx, i.x, i.y, 0,
-                             BARY_COL(bary, col));
+                             colerpv(col, bary));
             }
         }
     }
