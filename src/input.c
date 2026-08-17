@@ -1,4 +1,5 @@
 #include "input.h"
+#include "common.h"
 
 #include <SDL2/SDL.h>
 
@@ -27,4 +28,6 @@ void input_process(const uint8_t* keystate)
         { g_camera.look_at.y += delta_look; }
     if (keystate[SDL_SCANCODE_DOWN]) 
         { g_camera.look_at.y -= delta_look; }
+    if (keystate[SDL_SCANCODE_F1])
+        {g_snapshot_mode = true;}
 }

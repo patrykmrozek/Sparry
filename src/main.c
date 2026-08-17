@@ -6,10 +6,11 @@
 #define CELP_IMPLEMENTATION
 
 #include "raster.h"
-#include "result.h"
-#include "common.h"
 #include "render.h"
+#include "result.h"
 #include "input.h"
+
+bool g_snapshot_mode = false;
 
 int main() 
 {
@@ -33,7 +34,7 @@ int main()
     bool game_running = 1;
     const u8* keystate = SDL_GetKeyboardState(NULL);
 
-    colour_t c = (colour_t){255, 255, 255, 10};
+    colour_t c = (colour_t){255, 255, 255, 255};
 
     while (game_running) {
         while (SDL_PollEvent(&event)) {
@@ -42,6 +43,7 @@ int main()
             }
         }
 
+        g_snapshot_mode = false;
         input_process(keystate);
         rd_frame_begin(rd_state);
         {

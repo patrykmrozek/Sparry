@@ -1,4 +1,5 @@
 #include "raster.h"
+#include "common.h"
 #include "aabb.h"
 #include "transform.h"
 

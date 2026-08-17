@@ -6,7 +6,25 @@
 #include "../../celp/celp.h"
 #undef log
 
-#include <stdint.h>
+extern bool g_snapshot_mode;
+
+#ifdef SNAPSHOT_MODE
+    #undef DEBUG 
+    #undef TRACE
+    #define DEBUG(lvl, fmt, ...) \
+    do { \
+        if (g_snapshot_mode) { \
+            CELP_DEBUG(lvl, fmt, ##__VA_ARGS__); \
+        } \
+    } while(0)
+
+    #define TRACE(lvl, fmt, ...) \
+    do { \
+        if (g_snapshot_mode) { \
+            CELP_TRACE(lvl, fmt, ##__VA_ARGS__); \
+        } \
+    } while(0)
+#endif //SNAPSHOT_MODE
 
 #define PI 3.14159265359f
 

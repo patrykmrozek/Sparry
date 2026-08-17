@@ -2,6 +2,7 @@ OUT = sparry
 
 $(OUT):
 	gcc \
+		-DSNAPSHOT_MODE \
 		-DLOG_MODE_ALL \
 		src/main.c \
 		src/aabb.c \
