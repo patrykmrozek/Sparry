@@ -59,13 +59,16 @@ void rd_state_destroy(rd_state_t *rd_state)
 }
 
 
-void rd_frame_begin(rd_state_t *rd_state)
+void rd_frame_begin(rd_state_t *state)
 {
-   rt_ctx_clear(rd_state->rt_ctx); 
+   rt_ctx_clear(state->rt_ctx); 
 }
 
 void rd_frame_end(rd_state_t *state)
 {
+    SDL_SetRenderDrawColor(state->renderer, 0, 0, 0, 255);
+    SDL_RenderClear(state->renderer);
+
     SDL_UpdateTexture(state->texture,
                       NULL, 
                       state->rt_ctx->fbuffer, 
