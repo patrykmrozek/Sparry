@@ -9,10 +9,13 @@ v3 trans_to_view(v3 v)
 
     // any objects in front have pos z
     view_z = v3_norm(v3_sub(g_camera.look_at, g_camera.pos)); 
+    TRACE(3, "view_z: %f, %f, %f", view_z.x, view_z.y, view_z.z);
     // perp of z and up (right)
     view_x = v3_norm(v3_cross(g_camera.up, view_z));  
+    TRACE(3, "view_x: %f, %f, %f", view_x.x, view_x.y, view_x.z);
     // perp of x and z (y)
     view_y = v3_norm(v3_cross(view_z, view_x)); 
+    TRACE(3, "view_y: %f, %f, %f", view_y.x, view_y.y, view_y.z);
     
     // rot world into camera coords
     // translate world relative to camera
