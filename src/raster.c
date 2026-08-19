@@ -161,8 +161,9 @@ void rt_put_tri(rt_ctx_t *ctx, v3 a, v3 b, v3 c, colour_t col)
             DEBUG(1, "BARY (%d, %d): %f %f %f",
                   i.x, i.y, bary.x, bary.y, bary.z);
 
+            f32 inter_z = (bary.x * as.z) + (bary.y * bs.z) + (bary.z * cs.z);
             if (!v3_contains_neg(bary)) {
-                rt_put_pixel(ctx, i.x, i.y, 0,
+                rt_put_pixel(ctx, i.x, i.y, inter_z,
                              colerpv(col, bary));
             }
         }
