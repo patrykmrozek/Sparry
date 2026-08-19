@@ -143,13 +143,11 @@ void rt_put_tri(rt_ctx_t *ctx,
           tri_aabb.min.x, tri_aabb.min.y,
           tri_aabb.max.x, tri_aabb.max.y);
     v2i i;
-    for (i.x = tri_aabb.min.x; i.x < tri_aabb.max.x; i.x++) {
-        for (i.y = tri_aabb.min.y; i.y < tri_aabb.max.y; i.y++) {
-            v3 bary = barycentric(V3_TO_V2i(as), 
-                                  V3_TO_V2i(bs),
-                                  V3_TO_V2i(cs),
+            v3 bary = barycentric(V3_TO_V2(as), 
+                                  V3_TO_V2(bs),
+                                  V3_TO_V2(cs),
                                   i);
-            DEBUG(0, "BARY (%d, %d): %f %f %f",
+            DEBUG(1, "BARY (%d, %d): %f %f %f",
                   i.x, i.y, bary.x, bary.y, bary.z);
 
             if (!v3_contains_neg(bary)) {
