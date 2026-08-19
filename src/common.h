@@ -23,6 +23,9 @@ extern bool g_snapshot_mode;
 #define CLAMP_Y_TO_SCREEN(y) \
     ((y) < 0 ? 0 : (y) >= SCREEN_HEIGHT ? SCREEN_HEIGHT : (y))
 
+#define CLAMP_XY_TO_SCREEN(x, y) \
+    CLAMP_X_TO_SCREEN(x), CLAMP_Y_TO_SCREEN(y) 
+
 #define DEG_TO_RAD(_d) ((_d) * (PI / 180)) 
 #define RAD_TO_DEG(_d) ((_d) * (180 / PI))
 

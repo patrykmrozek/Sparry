@@ -142,14 +142,8 @@ void rt_put_tri(rt_ctx_t *ctx, v3 a, v3 b, v3 c, colour_t col)
           tri_aabb.min.x, tri_aabb.min.y,
           tri_aabb.max.x, tri_aabb.max.y);
     
-    v2i mini = (v2i){
-        .x = CLAMP_X_TO_SCREEN(tri_aabb.min.x),
-        .y = CLAMP_Y_TO_SCREEN(tri_aabb.min.y)
-    };
-    v2i maxi = (v2i){
-        .x = CLAMP_X_TO_SCREEN(tri_aabb.max.x),
-        .y = CLAMP_Y_TO_SCREEN(tri_aabb.max.y)
-    };
+    v2i mini = (v2i){CLAMP_XY_TO_SCREEN(tri_aabb.min.x, tri_aabb.min.y)};
+    v2i maxi = (v2i){CLAMP_XY_TO_SCREEN(tri_aabb.max.x, tri_aabb.max.y)};
 
     v2i i;
     for (i.x = mini.x; i.x < maxi.x; i.x++) {
