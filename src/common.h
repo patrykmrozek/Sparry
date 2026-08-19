@@ -8,24 +8,6 @@
 
 extern bool g_snapshot_mode;
 
-#ifdef SNAPSHOT_MODE
-    #undef DEBUG 
-    #undef TRACE
-    #define DEBUG(lvl, fmt, ...) \
-    do { \
-        if (g_snapshot_mode) { \
-            CELP_DEBUG(lvl, fmt, ##__VA_ARGS__); \
-        } \
-    } while(0)
-
-    #define TRACE(lvl, fmt, ...) \
-    do { \
-        if (g_snapshot_mode) { \
-            CELP_TRACE(lvl, fmt, ##__VA_ARGS__); \
-        } \
-    } while(0)
-#endif //SNAPSHOT_MODE
-
 #define PI 3.14159265359f
 
 #define NEAR 1.0f
@@ -34,6 +16,12 @@ extern bool g_snapshot_mode;
 
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 600
+
+#define CLAMP_X_TO_SCREEN(x) \
+    ((x) < 0 ? 0 : (x) >= SCREEN_WIDTH ? SCREEN_WIDTH : (x))
+
+#define CLAMP_Y_TO_SCREEN(y) \
+    ((y) < 0 ? 0 : (y) >= SCREEN_HEIGHT ? SCREEN_HEIGHT : (y))
 
 #define DEG_TO_RAD(_d) ((_d) * (PI / 180)) 
 #define RAD_TO_DEG(_d) ((_d) * (180 / PI))
@@ -63,5 +51,23 @@ extern bool g_snapshot_mode;
         goto tag; \
     } \
  })
+
+#ifdef SNAPSHOT_MODE
+    #undef DEBUG 
+    #undef TRACE
+    #define DEBUG(lvl, fmt, ...) \
+    do { \
+        if (g_snapshot_mode) { \
+            CELP_DEBUG(lvl, fmt, ##__VA_ARGS__); \
+        } \
+    } while(0)
+
+    #define TRACE(lvl, fmt, ...) \
+    do { \
+        if (g_snapshot_mode) { \
+            CELP_TRACE(lvl, fmt, ##__VA_ARGS__); \
+        } \
+    } while(0)
+#endif //SNAPSHOT_MODE
 
 #endif //_COMMON_H

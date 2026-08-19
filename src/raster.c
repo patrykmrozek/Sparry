@@ -31,7 +31,7 @@ void rt_ctx_destroy(rt_ctx_t *ctx)
 void rt_put_pixel(rt_ctx_t *ctx, i32 x, i32 y, f32 z, colour_t col)
 {
     if (!IN_BOUNDS(x, y)) {
-        DEBUG(3, "pixel out of bounds: {%d, %d}", x, y);
+        DEBUG(0, "pixel out of bounds: {%d, %d}", x, y);
         return;
     }
     u32 idx = (y * SCREEN_WIDTH) + x;
@@ -105,7 +105,7 @@ void rt_put_line(rt_ctx_t *ctx, v3 p0, v3 p1, colour_t col)
     i32 diff = (2 * dy) - dx;
     i32 y = y0;
 
-    for (i32 x = x0; x < x1; x++) {
+    for (i32 x = x0; x <= x1; x++) {
         DEBUG(3, "DIFF: %d", diff);
 
         if (is_steep) rt_put_pixel(ctx, y, x, 0, col);
@@ -127,14 +127,13 @@ void rt_put_line(rt_ctx_t *ctx, v3 p0, v3 p1, colour_t col)
  * barycentric coordinates of P, and if each x,y,z of that coord is positive, 
  * then P is inside the triangle, and therefore we can put a pixel at P.
  */
-void rt_put_tri(rt_ctx_t *ctx,
-                v3 a, v3 b, v3 c, colour_t col)
+void rt_put_tri(rt_ctx_t *ctx, v3 a, v3 b, v3 c, colour_t col)
 {
     v3 as, bs, cs;
     if (!trans_world_to_screen(a, &as) || 
         !trans_world_to_screen(b, &bs) ||
         !trans_world_to_screen(c, &cs)) {
-        DEBUG(3, "returning early");
+        TRACE(3, "returning early");
         return;
     } 
 
@@ -142,7 +141,19 @@ void rt_put_tri(rt_ctx_t *ctx,
     DEBUG(2, "AABB: min %f %f -- max %f %f",
           tri_aabb.min.x, tri_aabb.min.y,
           tri_aabb.max.x, tri_aabb.max.y);
+    
+    v2i mini = (v2i){
+        .x = CLAMP_X_TO_SCREEN(tri_aabb.min.x),
+        .y = CLAMP_Y_TO_SCREEN(tri_aabb.min.y)
+    };
+    v2i maxi = (v2i){
+        .x = CLAMP_X_TO_SCREEN(tri_aabb.max.x),
+        .y = CLAMP_Y_TO_SCREEN(tri_aabb.max.y)
+    };
+
     v2i i;
+    for (i.x = mini.x; i.x < maxi.x; i.x++) {
+        for (i.y = mini.y; i.y < maxi.y; i.y++) {
             v3 bary = barycentric(V3_TO_V2(as), 
                                   V3_TO_V2(bs),
                                   V3_TO_V2(cs),
