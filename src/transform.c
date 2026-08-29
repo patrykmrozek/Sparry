@@ -26,7 +26,7 @@ v3 tf_view(v3 v)
       {0,   0,    0,   1},
     }};
 
-    ret = v4_to_v3(m4_v4_mul(view_mat, v3_to_v4(v, f32)), f32); //?
+    ret = V3_MAT_MUL(view_mat, v, f32);
 
     return ret;
 }
@@ -47,7 +47,7 @@ v3 tf_ndc(v3 v) //projection
         {0, 0, 1, 0},
     }};
 
-    ret = v4_to_v3(v4_norm(m4_v4_mul(proj_mat, v3_to_v4(v, f32))), f32);
+    ret = V3_MAT_MUL(proj_mat, v, f32);
 
     return ret;
 }

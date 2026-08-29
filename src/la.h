@@ -20,6 +20,9 @@ V4(f32)
 M4(f32)
 #define m4 M4_T(f32)
 
+#define V3_MAT_MUL(mat, v, T) \
+    v4_to_v3(v4_norm(m4_v4_mul((mat), v3_to_v4((v), T))), T)
+
 static inline void v4_print(v4 v)
 {
     printf("{ %f, %f, %f, %f }\n", v.x, v.y, v.z, v.w);
@@ -55,7 +58,7 @@ static inline v3 barycentric(v2 a, v2 b, v2 c, v2i p)
 {
     //tri areas
     f32 tri_area = TRI_AREA(a, b, c);
-    DEBUG(0, "tri_area: (%f %f) | (%f %f) | (%f %f) = %f",
+    DEBUG(1, "tri_area: (%f %f) | (%f %f) | (%f %f) = %f",
           a.x, a.y, b.x, b.y, c.x, c.y, tri_area);
     f32 pbc = TRI_AREA(p, b, c)/tri_area;
     f32 pca = TRI_AREA(p, c, a)/tri_area;
