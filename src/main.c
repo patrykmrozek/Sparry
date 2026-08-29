@@ -20,15 +20,15 @@ int main()
     result_t res = rd_state_init(&rd_state);
     HANDLE_ERROR_RET(res!=RESULT_OK, 1, NULL);
     
-    v3 b1 = {-10, -10,  10};
-    v3 b2 = { 10, -10,  10};
-    v3 b3 = { 10, -10, -10};
-    v3 b4 = {-10, -10, -10};
+    v3 bfl = {-10, -10,  10};
+    v3 bfr = { 10, -10,  10};
+    v3 bcr = { 10, -10, -10};
+    v3 bcl = {-10, -10, -10};
 
-    v3 t1 = {-10, 10,  10};
-    v3 t2 = { 10, 10,  10};
-    v3 t3 = { 10, 10, -10};
-    v3 t4 = {-10, 10, -10};
+    v3 tfl = {-10, 10,  10};
+    v3 tfr = { 10, 10,  10};
+    v3 tcr = { 10, 10, -10};
+    v3 tcl = {-10, 10, -10};
 
     SDL_Event event;
     bool game_running = 1;
@@ -47,11 +47,23 @@ int main()
         rd_frame_begin(rd_state);
         {
             //front
-            rt_put_tri(rd_state->rt_ctx, t4, t3, b4, c);
-            rt_put_tri(rd_state->rt_ctx, t3, b4, b3, c);
+            rt_put_tri(rd_state->rt_ctx, tcl, bcl, bcr, c); 
+            rt_put_tri(rd_state->rt_ctx, tcl, tcr, bcr, c); 
             //back
-            rt_put_tri(rd_state->rt_ctx, t1, b1, b2, c);
-            rt_put_tri(rd_state->rt_ctx, t2, t1, b2, c); 
+            rt_put_tri(rd_state->rt_ctx, tfl, bfl, bfr, c); 
+            rt_put_tri(rd_state->rt_ctx, tfl, tfr, bfr, c); 
+            //bottom
+            rt_put_tri(rd_state->rt_ctx, bfl, bcl, bcr, c); 
+            rt_put_tri(rd_state->rt_ctx, bfl, bfr, bcr, c); 
+            //top
+            rt_put_tri(rd_state->rt_ctx, tfl, tcl, tcr, c); 
+            rt_put_tri(rd_state->rt_ctx, tfl, tfr, tcr, c);
+            //left
+            rt_put_tri(rd_state->rt_ctx, tfl, bfl, bcl, c); 
+            rt_put_tri(rd_state->rt_ctx, tfl, tcl, bcl, c); 
+            //right
+            rt_put_tri(rd_state->rt_ctx, tfr, bfr, bcr, c); 
+            rt_put_tri(rd_state->rt_ctx, tfr, tcr, bcr, c); 
         }
         rd_frame_end(rd_state); 
     }
