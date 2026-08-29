@@ -5,20 +5,26 @@
 #include <stdio.h>
 #include "common.h"
 
-V2(f32)
-#define v2 V2_T(f32)
+#undef v2
+#undef v3
+#undef v4
+#undef m4
 
-V2(i32)
-#define v2i V2_T(i32)
 
-V3(f32)
-#define v3 V3_T(f32)
+celp_v2(f32);
+#define v2 v2_t(f32)
 
-V4(f32)
-#define v4 V4_T(f32)
+celp_v2(i32);
+#define v2i v2_t(i32)
 
-M4(f32)
-#define m4 M4_T(f32)
+celp_v3(f32);
+#define v3 v3_t(f32)
+
+celp_v4(f32);
+#define v4 v4_t(f32)
+
+celp_m4(f32);
+#define m4 m4_t(f32)
 
 #define V3_MAT_MUL(mat, v, T) \
     v4_to_v3(v4_norm(m4_v4_mul((mat), v3_to_v4((v), T))), T)
