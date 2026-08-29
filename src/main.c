@@ -32,7 +32,6 @@ int main()
 
     SDL_Event event;
     bool game_running = 1;
-    const u8* keystate = SDL_GetKeyboardState(NULL);
 
     colour_t c = (colour_t){255, 255, 255, 255};
 
@@ -44,11 +43,15 @@ int main()
         }
 
         g_snapshot_mode = false;
-        input_process(keystate);
+        input_process();
         rd_frame_begin(rd_state);
         {
-            //rt_put_tri(rd_state->rt_ctx, t1, b1, b2, c);
-            rt_put_tri(rd_state->rt_ctx, t2, t1, b2, c);
+            //front
+            rt_put_tri(rd_state->rt_ctx, t4, t3, b4, c);
+            rt_put_tri(rd_state->rt_ctx, t3, b4, b3, c);
+            //back
+            rt_put_tri(rd_state->rt_ctx, t1, b1, b2, c);
+            rt_put_tri(rd_state->rt_ctx, t2, t1, b2, c); 
         }
         rd_frame_end(rd_state); 
     }

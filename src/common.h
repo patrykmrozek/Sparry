@@ -6,6 +6,8 @@
 #include "../../celp/celp.h"
 #undef log
 
+#include <SDL2/SDL.h>
+
 extern bool g_snapshot_mode;
 
 #define PI 3.14159265359f
@@ -72,5 +74,16 @@ extern bool g_snapshot_mode;
         } \
     } while(0)
 #endif //SNAPSHOT_MODE
+
+static inline 
+f64 get_delta_time()
+{
+    static f64 prev_time = 0;
+    f64 curr_time = SDL_GetTicks64();
+    f64 delta_time = (curr_time - prev_time) / 1000;
+    prev_time = curr_time;
+    DEBUG(0, "delta_time: %f", delta_time);
+    return delta_time;
+}
 
 #endif //_COMMON_H

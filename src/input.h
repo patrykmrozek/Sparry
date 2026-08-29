@@ -5,6 +5,6 @@
 
 extern camera_t g_camera;
 
-void input_process(const uint8_t* keystate);
+void input_process();
 
 #endif //_INPUT_H
