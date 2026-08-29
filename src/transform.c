@@ -66,14 +66,14 @@ bool tf_world_to_screen(v3 world, v3 *out)
 {
     v3 view, ndc, screen;
 
-    DEBUG(3, "ORIGINAL: " V3F_STR(world));
+    DEBUG(3, "ORIGINAL: " v3f_str(world));
     view = tf_view(world);
-    DEBUG(3, "VIEW: " V3F_STR(view));
+    DEBUG(3, "VIEW: " v3f_str(view));
     if (view.z < NEAR || view.z > FAR) return false; //clip
     ndc = tf_ndc(view);
-    DEBUG(3, "NDC: " V3F_STR(ndc));
+    DEBUG(3, "NDC: " v3f_str(ndc));
     screen = tf_screen(ndc);
-    DEBUG(3, "SCREEN: " V3F_STR(screen));
+    DEBUG(3, "SCREEN: " v3f_str(screen));
 
     //2d x,y - z=depth
     *out = screen;
