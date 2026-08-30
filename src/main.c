@@ -33,8 +33,6 @@ int main()
     SDL_Event event;
     bool game_running = 1;
 
-    colour_t c = (colour_t){255, 255, 255, 255};
-
     while (game_running) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
@@ -47,23 +45,23 @@ int main()
         rd_frame_begin(rd_state);
         {
             //front
-            rt_put_tri(rd_state->rt_ctx, tcl, bcl, bcr, c); 
-            rt_put_tri(rd_state->rt_ctx, tcl, tcr, bcr, c); 
+            rt_tri(rd_state->rt_ctx, tcl, bcl, bcr, COL_RED); 
+            rt_tri(rd_state->rt_ctx, tcl, tcr, bcr, COL_GREEN); 
             //back
-            rt_put_tri(rd_state->rt_ctx, tfl, bfl, bfr, c); 
-            rt_put_tri(rd_state->rt_ctx, tfl, tfr, bfr, c); 
+            rt_tri(rd_state->rt_ctx, tfl, bfl, bfr, COL_BLUE); 
+            rt_tri(rd_state->rt_ctx, tfl, tfr, bfr, COL_YELLOW); 
             //bottom
-            rt_put_tri(rd_state->rt_ctx, bfl, bcl, bcr, c); 
-            rt_put_tri(rd_state->rt_ctx, bfl, bfr, bcr, c); 
+            rt_tri(rd_state->rt_ctx, bfl, bcl, bcr, COL_PURPLE); 
+            rt_tri(rd_state->rt_ctx, bfl, bfr, bcr, COL_WHITE); 
             //top
-            rt_put_tri(rd_state->rt_ctx, tfl, tcl, tcr, c); 
-            rt_put_tri(rd_state->rt_ctx, tfl, tfr, tcr, c);
+            rt_tri(rd_state->rt_ctx, tfl, tcl, tcr, COL_BLACK); 
+            rt_tri(rd_state->rt_ctx, tfl, tfr, tcr, COL_LBLUE);
             //left
-            rt_put_tri(rd_state->rt_ctx, tfl, bfl, bcl, c); 
-            rt_put_tri(rd_state->rt_ctx, tfl, tcl, bcl, c); 
+            rt_tri(rd_state->rt_ctx, tfl, bfl, bcl, COL_ORANGE); 
+            rt_tri(rd_state->rt_ctx, tfl, tcl, bcl, COL_PINK); 
             //right
-            rt_put_tri(rd_state->rt_ctx, tfr, bfr, bcr, c); 
-            rt_put_tri(rd_state->rt_ctx, tfr, tcr, bcr, c); 
+            rt_tri(rd_state->rt_ctx, tfr, bfr, bcr, COL_LGREY); 
+            rt_tri(rd_state->rt_ctx, tfr, tcr, bcr, COL_DGREY); 
         }
         rd_frame_end(rd_state); 
     }
