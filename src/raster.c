@@ -28,7 +28,7 @@ void rt_ctx_destroy(rt_ctx_t *ctx)
     free(ctx);
 }
 
-void rt_put_pixel(rt_ctx_t *ctx, i32 x, i32 y, f32 z, colour_t col)
+void rt_pixel(rt_ctx_t *ctx, i32 x, i32 y, f32 z, col_t col)
 {
     if (!IN_BOUNDS(x, y)) {
         DEBUG(0, "pixel out of bounds: {%d, %d}", x, y);
@@ -41,16 +41,16 @@ void rt_put_pixel(rt_ctx_t *ctx, i32 x, i32 y, f32 z, colour_t col)
     }
 }
 
-void rt_put_pixel_vec(rt_ctx_t *ctx, v3 v, colour_t col)
+void rt_pixel_vec(rt_ctx_t *ctx, v3 v, col_t col)
 {
     i32 x = (i32)v.x;
     i32 y = (i32)v.y;
 
-    rt_put_pixel(ctx, x, y, v.z, col);
+    rt_pixel(ctx, x, y, v.z, col);
 }
 
 /*
- * rt_put_line()
+ * rt_line()
  * this function works as follows: 
  * youve got two points, p0, p1, depending on the slope of the line between
  * these points, we do one of these two things:
@@ -73,7 +73,7 @@ void rt_put_pixel_vec(rt_ctx_t *ctx, v3 v, colour_t col)
  * when we're putting pixels, we then must check if is_steep, in  which case we
  * must put the pixels in reverse order essentially undo the swap above.
  */
-void rt_put_line(rt_ctx_t *ctx, v3 p0, v3 p1, colour_t col)
+void rt_line(rt_ctx_t *ctx, v3 p0, v3 p1, col_t col)
 {
     v3 p0s, p1s;
     if (!tf_world_to_screen(p0, &p0s)) return;
@@ -108,8 +108,8 @@ void rt_put_line(rt_ctx_t *ctx, v3 p0, v3 p1, colour_t col)
     for (i32 x = x0; x <= x1; x++) {
         DEBUG(3, "DIFF: %d", diff);
 
-        if (is_steep) rt_put_pixel(ctx, y, x, 0, col);
-        else          rt_put_pixel(ctx, x, y, 0, col);
+        if (is_steep) rt_pixel(ctx, y, x, 0, col);
+        else          rt_pixel(ctx, x, y, 0, col);
 
         if (diff >= 0) {
             y += yi;
@@ -121,13 +121,14 @@ void rt_put_line(rt_ctx_t *ctx, v3 p0, v3 p1, colour_t col)
 }
 
 /*
- * rt_put_tri()
+ * rt_tri()
  * We translate each point to screen space, then calculate the bounding box of
  * the triangle. Then for each pixel P inside this bounding box, we check the 
  * barycentric coordinates of P, and if each x,y,z of that coord is positive, 
  * then P is inside the triangle, and therefore we can put a pixel at P.
  */
-void rt_put_tri(rt_ctx_t *ctx, v3 a, v3 b, v3 c, colour_t col)
+void rt_tri3c(rt_ctx_t *ctx, v3 a, v3 b, v3 c,
+              col_t c1, col_t c2, col_t c3)
 {
     v3 as, bs, cs;
     if (!tf_world_to_screen(a, &as) || 
@@ -156,11 +157,15 @@ void rt_put_tri(rt_ctx_t *ctx, v3 a, v3 b, v3 c, colour_t col)
                   i.x, i.y, bary.x, bary.y, bary.z);
 
             f32 inter_z = (bary.x * as.z) + (bary.y * bs.z) + (bary.z * cs.z);
+            col_t inter_c = col_blend3(c1, c2, c3, bary);
             if (!v3_contains_neg(bary)) {
-                rt_put_pixel(ctx, i.x, i.y, inter_z,
-                             colerpv(col, bary));
+                rt_pixel(ctx, i.x, i.y, inter_z, inter_c);
             }
         }
     }
 }
 
+void rt_tri(rt_ctx_t *ctx, v3 a, v3 b, v3 c, col_t col)
+{
+    rt_tri3c(ctx, a, b, c, col, col, col);
+}
