@@ -30,6 +30,9 @@ int main()
     v3 tcr = { 10, 10, -10};
     v3 tcl = {-10, 10, -10};
 
+    v3 lp0 = {-20, 20, 20};
+    v3 lp1 = { 20, -20, -20};
+
     SDL_Event event;
     bool game_running = 1;
 
@@ -43,9 +46,10 @@ int main()
         g_snapshot_mode = false;
         input_process();
         rd_frame_begin(rd_state);
-        {
+        { 
             //front
-            rt_tri(rd_state->rt_ctx, tcl, bcl, bcr, COL_RED); 
+            rt_tri3c(rd_state->rt_ctx, tcl, bcl, bcr,
+                    COL_RED, COL_GREEN, COL_BLUE); 
             rt_tri(rd_state->rt_ctx, tcl, tcr, bcr, COL_GREEN); 
             //back
             rt_tri(rd_state->rt_ctx, tfl, bfl, bfr, COL_BLUE); 
@@ -61,7 +65,9 @@ int main()
             rt_tri(rd_state->rt_ctx, tfl, tcl, bcl, COL_PINK); 
             //right
             rt_tri(rd_state->rt_ctx, tfr, bfr, bcr, COL_LGREY); 
-            rt_tri(rd_state->rt_ctx, tfr, tcr, bcr, COL_DGREY); 
+            rt_tri(rd_state->rt_ctx, tfr, tcr, bcr, COL_DGREY);  
+            //line
+            rt_line(rd_state->rt_ctx, lp0, lp1, COL_RED);
         }
         rd_frame_end(rd_state); 
     }

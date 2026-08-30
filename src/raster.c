@@ -85,6 +85,8 @@ void rt_line(rt_ctx_t *ctx, v3 p0, v3 p1, col_t col)
     i32 y0 = (i32)p0s.y;
     i32 x1 = (i32)p1s.x;
     i32 y1 = (i32)p1s.y;
+    f32 z0 = p0s.z;
+    f32 z1 = p1s.z;
 
     bool is_steep = abs(y1 - y0) > abs(x1 - x0); 
 
@@ -96,6 +98,7 @@ void rt_line(rt_ctx_t *ctx, v3 p0, v3 p1, col_t col)
     if (x0 > x1) {
         SWAP(x0, x1);
         SWAP(y0, y1);
+        SWAP(z0, z1);
     }
 
     i32 dx = x1 - x0;
@@ -105,11 +108,14 @@ void rt_line(rt_ctx_t *ctx, v3 p0, v3 p1, col_t col)
     i32 diff = (2 * dy) - dx;
     i32 y = y0;
 
+    f32 z = z0;
+    f32 dz = (dx != 0) ? (z1 - z0) / (f32)dx : 0;
+
     for (i32 x = x0; x <= x1; x++) {
         DEBUG(3, "DIFF: %d", diff);
 
-        if (is_steep) rt_pixel(ctx, y, x, 0, col);
-        else          rt_pixel(ctx, x, y, 0, col);
+        if (is_steep) rt_pixel(ctx, y, x, z, col);
+        else          rt_pixel(ctx, x, y, z, col);
 
         if (diff >= 0) {
             y += yi;
@@ -117,6 +123,7 @@ void rt_line(rt_ctx_t *ctx, v3 p0, v3 p1, col_t col)
         } else {
             diff += (2 * dy);
         }
+        z += dz;
     }
 }
 
