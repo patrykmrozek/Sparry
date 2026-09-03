@@ -82,8 +82,8 @@ void
 raster_line(raster_ctx_t *ctx, v3 p0, v3 p1, col_t col)
 {
     v3 p0s, p1s;
-    if (!tf_world_to_screen(p0, &p0s)) return;
-    if (!tf_world_to_screen(p1, &p1s)) return;
+    if (!trans_world_to_screen(p0, &p0s)) return;
+    if (!trans_world_to_screen(p1, &p1s)) return;
     DEBUG(3, "p0s = %f %f | p1f = %f %f",
           p0s.x, p0s.y, p1s.x, p1s.y);
 
@@ -145,9 +145,9 @@ raster_tri3c(raster_ctx_t *ctx, v3 a, v3 b, v3 c,
               col_t c1, col_t c2, col_t c3)
 {
     v3 as, bs, cs;
-    if (!tf_world_to_screen(a, &as) || 
-        !tf_world_to_screen(b, &bs) ||
-        !tf_world_to_screen(c, &cs)) {
+    if (!trans_world_to_screen(a, &as) || 
+        !trans_world_to_screen(b, &bs) ||
+        !trans_world_to_screen(c, &cs)) {
         TRACE(3, "returning early");
         return;
     } 

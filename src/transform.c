@@ -1,7 +1,8 @@
 #include "transform.h"
 #include "common.h"
 
-v3 tf_view(v3 v)
+v3 
+trans_view(v3 v)
 {
     v3 view_x, view_y, view_z;
     m4 view_mat;
@@ -31,7 +32,8 @@ v3 tf_view(v3 v)
     return ret;
 }
 
-v3 tf_ndc(v3 v) //projection
+v3 
+trans_ndc(v3 v) //projection
 {
     f32 aspect, f;
     m4 proj_mat;
@@ -52,7 +54,8 @@ v3 tf_ndc(v3 v) //projection
     return ret;
 }
 
-v3 tf_screen(v3 v)
+v3 
+trans_screen(v3 v)
 {
     v3 ret;
     ret.x = (v.x + 1.0f) * 0.5f * SCREEN_WIDTH;
@@ -62,17 +65,18 @@ v3 tf_screen(v3 v)
     return ret;
 }
 
-bool tf_world_to_screen(v3 world, v3 *out)
+bool 
+trans_world_to_screen(v3 world, v3 *out)
 {
     v3 view, ndc, screen;
 
     DEBUG(3, "ORIGINAL: " v3f_str(world));
-    view = tf_view(world);
+    view = trans_view(world);
     DEBUG(3, "VIEW: " v3f_str(view));
     if (view.z < NEAR || view.z > FAR) return false; //clip
-    ndc = tf_ndc(view);
+    ndc = trans_ndc(view);
     DEBUG(3, "NDC: " v3f_str(ndc));
-    screen = tf_screen(ndc);
+    screen = trans_screen(ndc);
     DEBUG(3, "SCREEN: " v3f_str(screen));
 
     //2d x,y - z=depth
