@@ -2,11 +2,11 @@
 #include "raster.h"
 #include "result.h"
 
-result_t rd_state_init(rd_state_t **state_pp) 
+result_t render_state_init(render_state_t **state_pp) 
 {
     result_t res;
 
-    rd_state_t *state = malloc(sizeof(rd_state_t));
+    render_state_t *state = malloc(sizeof(render_state_t));
     HANDLE_ERROR_RET(!state, RESULT_ERROR_ALLOC, "rd state alloc");
 
     SDL_Init(SDL_INIT_VIDEO);
@@ -45,26 +45,26 @@ result_t rd_state_init(rd_state_t **state_pp)
     return RESULT_OK;
 
 err:
-    rd_state_destroy(state);
+    render_state_destroy(state);
     return res;
 }
 
-void rd_state_destroy(rd_state_t *rd_state)
+void render_state_destroy(render_state_t *render_state)
 {
-    if (rd_state->texture)    SDL_DestroyTexture(rd_state->texture);
-    if (rd_state->renderer)   SDL_DestroyRenderer(rd_state->renderer);
-    if (rd_state->window)     SDL_DestroyWindow(rd_state->window);
-    if (rd_state->rt_ctx)     rt_ctx_destroy(rd_state->rt_ctx);
-    if (rd_state)             free(rd_state);
+    if (render_state->texture)    SDL_DestroyTexture(render_state->texture);
+    if (render_state->renderer)   SDL_DestroyRenderer(render_state->renderer);
+    if (render_state->window)     SDL_DestroyWindow(render_state->window);
+    if (render_state->rt_ctx)     rt_ctx_destroy(render_state->rt_ctx);
+    if (render_state)             free(render_state);
 }
 
 
-void rd_frame_begin(rd_state_t *state)
+void render_frame_begin(render_state_t *state)
 {
    rt_ctx_clear(state->rt_ctx); 
 }
 
-void rd_frame_end(rd_state_t *state)
+void render_frame_end(render_state_t *state)
 {
     SDL_SetRenderDrawColor(state->renderer, 0, 0, 0, 255);
     SDL_RenderClear(state->renderer);

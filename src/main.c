@@ -16,8 +16,8 @@ int main()
 {
     INFO("SPARRY\n");
 
-    rd_state_t *rd_state;
-    result_t res = rd_state_init(&rd_state);
+    render_state_t *render_state;
+    result_t res = render_state_init(&render_state);
     HANDLE_ERROR_RET(res!=RESULT_OK, 1, NULL);
     
     v3 bfl = {-10, -10,  10};
@@ -45,33 +45,33 @@ int main()
 
         g_snapshot_mode = false;
         input_process();
-        rd_frame_begin(rd_state);
+        render_frame_begin(render_state);
         { 
             //front
-            rt_tri3c(rd_state->rt_ctx, tcl, bcl, bcr,
+            rt_tri3c(render_state->rt_ctx, tcl, bcl, bcr,
                     COL_RED, COL_GREEN, COL_BLUE); 
-            rt_tri(rd_state->rt_ctx, tcl, tcr, bcr, COL_GREEN); 
+            rt_tri(render_state->rt_ctx, tcl, tcr, bcr, COL_GREEN); 
             //back
-            rt_tri(rd_state->rt_ctx, tfl, bfl, bfr, COL_BLUE); 
-            rt_tri(rd_state->rt_ctx, tfl, tfr, bfr, COL_YELLOW); 
+            rt_tri(render_state->rt_ctx, tfl, bfl, bfr, COL_BLUE); 
+            rt_tri(render_state->rt_ctx, tfl, tfr, bfr, COL_YELLOW); 
             //bottom
-            rt_tri(rd_state->rt_ctx, bfl, bcl, bcr, COL_PURPLE); 
-            rt_tri(rd_state->rt_ctx, bfl, bfr, bcr, COL_WHITE); 
+            rt_tri(render_state->rt_ctx, bfl, bcl, bcr, COL_PURPLE); 
+            rt_tri(render_state->rt_ctx, bfl, bfr, bcr, COL_WHITE); 
             //top
-            rt_tri(rd_state->rt_ctx, tfl, tcl, tcr, COL_BLACK); 
-            rt_tri(rd_state->rt_ctx, tfl, tfr, tcr, COL_LBLUE);
+            rt_tri(render_state->rt_ctx, tfl, tcl, tcr, COL_BLACK); 
+            rt_tri(render_state->rt_ctx, tfl, tfr, tcr, COL_LBLUE);
             //left
-            rt_tri(rd_state->rt_ctx, tfl, bfl, bcl, COL_ORANGE); 
-            rt_tri(rd_state->rt_ctx, tfl, tcl, bcl, COL_PINK); 
+            rt_tri(render_state->rt_ctx, tfl, bfl, bcl, COL_ORANGE); 
+            rt_tri(render_state->rt_ctx, tfl, tcl, bcl, COL_PINK); 
             //right
-            rt_tri(rd_state->rt_ctx, tfr, bfr, bcr, COL_LGREY); 
-            rt_tri(rd_state->rt_ctx, tfr, tcr, bcr, COL_DGREY);  
+            rt_tri(render_state->rt_ctx, tfr, bfr, bcr, COL_LGREY); 
+            rt_tri(render_state->rt_ctx, tfr, tcr, bcr, COL_DGREY);  
             //line
-            rt_line(rd_state->rt_ctx, lp0, lp1, COL_RED);
+            rt_line(render_state->rt_ctx, lp0, lp1, COL_RED);
         }
-        rd_frame_end(rd_state); 
+        render_frame_end(render_state); 
     }
 
-    rd_state_destroy(rd_state);
+    render_state_destroy(render_state);
     return 0;
 }
