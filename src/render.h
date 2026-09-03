@@ -9,7 +9,7 @@ typedef struct render_state_s {
     SDL_Renderer *renderer;
     SDL_Texture *texture; 
 
-    rt_ctx_t *rt_ctx;
+    raster_ctx_t *raster_ctx;
 } render_state_t;
 
 result_t render_state_init(render_state_t **state_pp); 

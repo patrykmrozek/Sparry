@@ -48,26 +48,26 @@ int main()
         render_frame_begin(render_state);
         { 
             //front
-            rt_tri3c(render_state->rt_ctx, tcl, bcl, bcr,
-                    COL_RED, COL_GREEN, COL_BLUE); 
-            rt_tri(render_state->rt_ctx, tcl, tcr, bcr, COL_GREEN); 
+            raster_tri3c(render_state->raster_ctx, tcl, bcl, bcr,
+                         COL_RED, COL_GREEN, COL_BLUE); 
+            raster_tri(render_state->raster_ctx, tcl, tcr, bcr, COL_GREEN); 
             //back
-            rt_tri(render_state->rt_ctx, tfl, bfl, bfr, COL_BLUE); 
-            rt_tri(render_state->rt_ctx, tfl, tfr, bfr, COL_YELLOW); 
+            raster_tri(render_state->raster_ctx, tfl, bfl, bfr, COL_BLUE); 
+            raster_tri(render_state->raster_ctx, tfl, tfr, bfr, COL_YELLOW); 
             //bottom
-            rt_tri(render_state->rt_ctx, bfl, bcl, bcr, COL_PURPLE); 
-            rt_tri(render_state->rt_ctx, bfl, bfr, bcr, COL_WHITE); 
+            raster_tri(render_state->raster_ctx, bfl, bcl, bcr, COL_PURPLE); 
+            raster_tri(render_state->raster_ctx, bfl, bfr, bcr, COL_WHITE); 
             //top
-            rt_tri(render_state->rt_ctx, tfl, tcl, tcr, COL_BLACK); 
-            rt_tri(render_state->rt_ctx, tfl, tfr, tcr, COL_LBLUE);
+            raster_tri(render_state->raster_ctx, tfl, tcl, tcr, COL_BLACK); 
+            raster_tri(render_state->raster_ctx, tfl, tfr, tcr, COL_LBLUE);
             //left
-            rt_tri(render_state->rt_ctx, tfl, bfl, bcl, COL_ORANGE); 
-            rt_tri(render_state->rt_ctx, tfl, tcl, bcl, COL_PINK); 
+            raster_tri(render_state->raster_ctx, tfl, bfl, bcl, COL_ORANGE); 
+            raster_tri(render_state->raster_ctx, tfl, tcl, bcl, COL_PINK); 
             //right
-            rt_tri(render_state->rt_ctx, tfr, bfr, bcr, COL_LGREY); 
-            rt_tri(render_state->rt_ctx, tfr, tcr, bcr, COL_DGREY);  
+            raster_tri(render_state->raster_ctx, tfr, bfr, bcr, COL_LGREY); 
+            raster_tri(render_state->raster_ctx, tfr, tcr, bcr, COL_DGREY);  
             //line
-            rt_line(render_state->rt_ctx, lp0, lp1, COL_RED);
+            raster_line(render_state->raster_ctx, lp0, lp1, COL_RED);
         }
         render_frame_end(render_state); 
     }

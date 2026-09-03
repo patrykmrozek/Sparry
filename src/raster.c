@@ -3,7 +3,8 @@
 #include "aabb.h"
 #include "transform.h"
 
-void rt_ctx_clear(rt_ctx_t *ctx)
+void
+raster_ctx_clear(raster_ctx_t *ctx)
 {
     memset(ctx->fbuffer, 0, sizeof(ctx->fbuffer));
 
@@ -12,23 +13,26 @@ void rt_ctx_clear(rt_ctx_t *ctx)
     }
 }
 
-result_t rt_ctx_init(rt_ctx_t **ctx_pp)
+result_t 
+raster_ctx_init(raster_ctx_t **ctx_pp)
 {
-    rt_ctx_t *ctx = (rt_ctx_t*)malloc(sizeof(*ctx));
+    raster_ctx_t *ctx = (raster_ctx_t*)malloc(sizeof(*ctx));
     HANDLE_ERROR_RET(!ctx, RESULT_ERROR_ALLOC,
                      "rt ctx init alloc");
-    rt_ctx_clear(ctx);
+    raster_ctx_clear(ctx);
     *ctx_pp = ctx;
 
     return RESULT_OK;
 }
 
-void rt_ctx_destroy(rt_ctx_t *ctx)
+void 
+raster_ctx_destroy(raster_ctx_t *ctx)
 {
     free(ctx);
 }
 
-void rt_pixel(rt_ctx_t *ctx, i32 x, i32 y, f32 z, col_t col)
+void 
+raster_pixel(raster_ctx_t *ctx, i32 x, i32 y, f32 z, col_t col)
 {
     if (!IN_BOUNDS(x, y)) {
         DEBUG(0, "pixel out of bounds: {%d, %d}", x, y);
@@ -41,16 +45,17 @@ void rt_pixel(rt_ctx_t *ctx, i32 x, i32 y, f32 z, col_t col)
     }
 }
 
-void rt_pixel_vec(rt_ctx_t *ctx, v3 v, col_t col)
+void 
+raster_pixel_vec(raster_ctx_t *ctx, v3 v, col_t col)
 {
     i32 x = (i32)v.x;
     i32 y = (i32)v.y;
 
-    rt_pixel(ctx, x, y, v.z, col);
+    raster_pixel(ctx, x, y, v.z, col);
 }
 
 /*
- * rt_line()
+ * raster_line()
  * this function works as follows: 
  * youve got two points, p0, p1, depending on the slope of the line between
  * these points, we do one of these two things:
@@ -73,7 +78,8 @@ void rt_pixel_vec(rt_ctx_t *ctx, v3 v, col_t col)
  * when we're putting pixels, we then must check if is_steep, in  which case we
  * must put the pixels in reverse order essentially undo the swap above.
  */
-void rt_line(rt_ctx_t *ctx, v3 p0, v3 p1, col_t col)
+void 
+raster_line(raster_ctx_t *ctx, v3 p0, v3 p1, col_t col)
 {
     v3 p0s, p1s;
     if (!tf_world_to_screen(p0, &p0s)) return;
@@ -114,8 +120,8 @@ void rt_line(rt_ctx_t *ctx, v3 p0, v3 p1, col_t col)
     for (i32 x = x0; x <= x1; x++) {
         DEBUG(3, "DIFF: %d", diff);
 
-        if (is_steep) rt_pixel(ctx, y, x, z, col);
-        else          rt_pixel(ctx, x, y, z, col);
+        if (is_steep) raster_pixel(ctx, y, x, z, col);
+        else          raster_pixel(ctx, x, y, z, col);
 
         if (diff >= 0) {
             y += yi;
@@ -128,13 +134,14 @@ void rt_line(rt_ctx_t *ctx, v3 p0, v3 p1, col_t col)
 }
 
 /*
- * rt_tri()
+ * raster_tri()
  * We translate each point to screen space, then calculate the bounding box of
  * the triangle. Then for each pixel P inside this bounding box, we check the 
  * barycentric coordinates of P, and if each x,y,z of that coord is positive, 
  * then P is inside the triangle, and therefore we can put a pixel at P.
  */
-void rt_tri3c(rt_ctx_t *ctx, v3 a, v3 b, v3 c,
+void 
+raster_tri3c(raster_ctx_t *ctx, v3 a, v3 b, v3 c,
               col_t c1, col_t c2, col_t c3)
 {
     v3 as, bs, cs;
@@ -166,13 +173,14 @@ void rt_tri3c(rt_ctx_t *ctx, v3 a, v3 b, v3 c,
             f32 inter_z = (bary.x * as.z) + (bary.y * bs.z) + (bary.z * cs.z);
             col_t inter_c = col_blend3(c1, c2, c3, bary);
             if (!v3_contains_neg(bary)) {
-                rt_pixel(ctx, i.x, i.y, inter_z, inter_c);
+                raster_pixel(ctx, i.x, i.y, inter_z, inter_c);
             }
         }
     }
 }
 
-void rt_tri(rt_ctx_t *ctx, v3 a, v3 b, v3 c, col_t col)
+void 
+raster_tri(raster_ctx_t *ctx, v3 a, v3 b, v3 c, col_t col)
 {
-    rt_tri3c(ctx, a, b, c, col, col, col);
+    raster_tri3c(ctx, a, b, c, col, col, col);
 }

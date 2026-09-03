@@ -2,7 +2,8 @@
 #include "raster.h"
 #include "result.h"
 
-result_t render_state_init(render_state_t **state_pp) 
+result_t 
+render_state_init(render_state_t **state_pp) 
 {
     result_t res;
 
@@ -37,9 +38,9 @@ result_t render_state_init(render_state_t **state_pp)
     INFO("texture: %p", state->texture);
     SDL_SetTextureBlendMode(state->texture, SDL_BLENDMODE_BLEND);
 
-    res = rt_ctx_init(&state->rt_ctx); 
+    res = raster_ctx_init(&state->raster_ctx); 
     HANDLE_ERROR_TAG(res!=RESULT_OK, RESULT_ERROR_ALLOC,
-                     "rt_ctx_init", res, err);
+                     "raster_ctx_init", res, err);
 
     *state_pp = state;
     return RESULT_OK;
@@ -49,29 +50,32 @@ err:
     return res;
 }
 
-void render_state_destroy(render_state_t *render_state)
+void 
+render_state_destroy(render_state_t *render_state)
 {
     if (render_state->texture)    SDL_DestroyTexture(render_state->texture);
     if (render_state->renderer)   SDL_DestroyRenderer(render_state->renderer);
     if (render_state->window)     SDL_DestroyWindow(render_state->window);
-    if (render_state->rt_ctx)     rt_ctx_destroy(render_state->rt_ctx);
+    if (render_state->raster_ctx)     raster_ctx_destroy(render_state->raster_ctx);
     if (render_state)             free(render_state);
 }
 
 
-void render_frame_begin(render_state_t *state)
+void 
+render_frame_begin(render_state_t *state)
 {
-   rt_ctx_clear(state->rt_ctx); 
+   raster_ctx_clear(state->raster_ctx); 
 }
 
-void render_frame_end(render_state_t *state)
+void 
+render_frame_end(render_state_t *state)
 {
     SDL_SetRenderDrawColor(state->renderer, 0, 0, 0, 255);
     SDL_RenderClear(state->renderer);
 
     SDL_UpdateTexture(state->texture,
                       NULL, 
-                      state->rt_ctx->fbuffer, 
+                      state->raster_ctx->fbuffer, 
                       SCREEN_WIDTH * sizeof(u32));
 
     SDL_RenderCopy(state->renderer,
